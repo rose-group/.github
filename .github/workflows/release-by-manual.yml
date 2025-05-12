@@ -5,12 +5,12 @@ name: Maven Release
 on:
   workflow_call:
     inputs:
-      version:
+      current-version:
         description: "Release version"
         required: true
         type: string
         default: "0.0.1"
-      nextVersion:
+      next-version:
         description: "Next version"
         required: true
         type: string
@@ -29,11 +29,11 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "RELEASE_VERSION=${{github.event.inputs.version}}" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=${{github.event.inputs.current-version}}" >> $GITHUB_ENV
           echo "NEXT_VERSION=${{github.event.inputs.nextVersion}}" >> $GITHUB_ENV
 
       - name: Validate version
-        if: contains(env.RELEASE_VERSION, 'SNAPSHOT')
+        if: contains(env.CURRENT_VERSION, 'SNAPSHOT')
         run: |
           echo '::error::Cannot release a SNAPSHOT version.'
           exit 1
@@ -69,10 +69,10 @@ jobs:
             echo "MAVEN_EXEC=mvn" >> $GITHUB_ENV
           fi
 
-      - name: Set release version
+      - name: Set Release version to ${CURRENT_VERSION}
         run: |
-          ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
-          git commit --no-verify -a -m "[CI Skip] Releasing ${RELEASE_VERSION}"
+          ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
 
       - name: Publish to Central
         run: ${MAVEN_EXEC} -B -DskipTests -Prelease deploy
@@ -81,11 +81,11 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
 
-      - name: Tag Release
+      - name: Tag v${CURRENT_VERSION}
         run: |
-          git tag -a "v${RELEASE_VERSION}" -m "Release v${RELEASE_VERSION}"
+          git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
 
-      - name: Next Version
+      - name: Set Next Version to ${NEXT_VERSION}
         run: |
           ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
           git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_VERSION}"
@@ -95,15 +95,15 @@ jobs:
           git push origin $(git rev-parse --abbrev-ref HEAD)
           git push --tags
 
-      - name: Create Release
+      - name: Release v${CURRENT_VERSION}
         run: |
-          gh release create v${RELEASE_VERSION} --generate-notes
+          gh release create v${CURRENT_VERSION} --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Close and create Milestone
+      - name: Release Milestone
         uses: rose-group/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          milestone-title: ${{ github.event.inputs.version }}
-          milestone-next: ${{ github.event.inputs.nextVersion }}
+          milestone-title: ${{ github.event.inputs.current-version }}
+          milestone-next: ${{ github.event.inputs.next-version }}

@@ -82,7 +82,7 @@ jobs:
       - name: Next Version
         run: |
           ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
-          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
+          git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_VERSION}"
 
       - name: Push changes
         run: |

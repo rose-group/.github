@@ -114,53 +114,53 @@ jobs:
           path: ${{env.ARTIFACT_PATH}}
           retention-days: 3
 
-      - name: Configure Git User
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Invoke Release workflow
-        run: |
-          gh workflow run deploy-artifacts.yml -R rose-group/rose-release \
-            -f github_repository=${GH_REPO} \
-            -f run_id=${GH_RUN_ID} \
-            -f version=${RELEASE_VERSION} \
-            -f name=${ARTIFACT_NAME} \
-            -f dry_run=${DRY_RUN}
-
-          echo "RELEASE_WORKFLOW_RUN_NAME=Deploy ${ARTIFACT_NAME} ${RELEASE_VERSION} to Central" >> $GITHUB_ENV
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          GH_RUN_ID: ${{ github.run_id }}
-          ARTIFACT_NAME: ${{ github.event.repository.name }}
-
-      - name: Output release version
-        id: out
-        run: |
-          # Wait for the deploy-artifacts.yml workflow to start
-          sleep 10
-          # Get the URL of the release workflow (MUST match the workflow's run-name)
-          RELEASE_WORKFLOW_DATA=$(gh run list --workflow deploy-artifacts.yml -R rose-group/rose-release --json databaseId,name,url -q ".[] | select(.name == \"${RELEASE_WORKFLOW_RUN_NAME}\")" --limit 1)
-          RELEASE_WORKFLOW_ID=$(jq -r '.databaseId' <<< $RELEASE_WORKFLOW_DATA)
-          RELEASE_WORKFLOW_URL=$(jq -r '.url' <<< $RELEASE_WORKFLOW_DATA)
-          echo "release-workflow-id=$RELEASE_WORKFLOW_ID" >> $GITHUB_OUTPUT
-          echo "release-workflow-url=$RELEASE_WORKFLOW_URL" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Report Job Summary
-        run: |
-          echo "## Deployment status" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
-          echo "Monitor the artifacts being deployed to central here:" >> $GITHUB_STEP_SUMMARY
-          echo "- [${RELEASE_WORKFLOW_RUN_NAME}](${SUMMARY_URL})" >> $GITHUB_STEP_SUMMARY
-        env:
-          SUMMARY_URL: ${{ steps.out.outputs.release-workflow-url }}
-
-      - name: Wait for the release workflow to finish
-        run: |
-          gh run watch ${RELEASE_WORKFLOW_ID} -R rose-group/rose-release --exit-status
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_WORKFLOW_ID: ${{ steps.out.outputs.release-workflow-id }}
+#      - name: Configure Git User
+#        run: |
+#          git config user.name "github-actions[bot]"
+#          git config user.email "github-actions[bot]@users.noreply.github.com"
+#
+#      - name: Invoke Release workflow
+#        run: |
+#          gh workflow run deploy-artifacts.yml -R rose-group/rose-release \
+#            -f github_repository=${GH_REPO} \
+#            -f run_id=${GH_RUN_ID} \
+#            -f version=${RELEASE_VERSION} \
+#            -f name=${ARTIFACT_NAME} \
+#            -f dry_run=${DRY_RUN}
+#
+#          echo "RELEASE_WORKFLOW_RUN_NAME=Deploy ${ARTIFACT_NAME} ${RELEASE_VERSION} to Central" >> $GITHUB_ENV
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          GH_REPO: ${{ github.repository }}
+#          GH_RUN_ID: ${{ github.run_id }}
+#          ARTIFACT_NAME: ${{ github.event.repository.name }}
+#
+#      - name: Output release version
+#        id: out
+#        run: |
+#          # Wait for the deploy-artifacts.yml workflow to start
+#          sleep 10
+#          # Get the URL of the release workflow (MUST match the workflow's run-name)
+#          RELEASE_WORKFLOW_DATA=$(gh run list --workflow deploy-artifacts.yml -R rose-group/rose-release --json databaseId,name,url -q ".[] | select(.name == \"${RELEASE_WORKFLOW_RUN_NAME}\")" --limit 1)
+#          RELEASE_WORKFLOW_ID=$(jq -r '.databaseId' <<< $RELEASE_WORKFLOW_DATA)
+#          RELEASE_WORKFLOW_URL=$(jq -r '.url' <<< $RELEASE_WORKFLOW_DATA)
+#          echo "release-workflow-id=$RELEASE_WORKFLOW_ID" >> $GITHUB_OUTPUT
+#          echo "release-workflow-url=$RELEASE_WORKFLOW_URL" >> $GITHUB_OUTPUT
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#
+#      - name: Report Job Summary
+#        run: |
+#          echo "## Deployment status" >> $GITHUB_STEP_SUMMARY
+#          echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
+#          echo "Monitor the artifacts being deployed to central here:" >> $GITHUB_STEP_SUMMARY
+#          echo "- [${RELEASE_WORKFLOW_RUN_NAME}](${SUMMARY_URL})" >> $GITHUB_STEP_SUMMARY
+#        env:
+#          SUMMARY_URL: ${{ steps.out.outputs.release-workflow-url }}
+#
+#      - name: Wait for the release workflow to finish
+#        run: |
+#          gh run watch ${RELEASE_WORKFLOW_ID} -R rose-group/rose-release --exit-status
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          RELEASE_WORKFLOW_ID: ${{ steps.out.outputs.release-workflow-id }}

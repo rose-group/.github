@@ -1,4 +1,4 @@
-name: Rose Prepare Release
+name: Prepare Release
 
 on:
   workflow_call:

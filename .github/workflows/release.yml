@@ -8,8 +8,8 @@ on:
       ref:
         required: false
         type: string
-        default: ''
-        description: The Git ref to checkout; defaults to the exact originating commit
+        default: ""
+        description: "Branch or tag to deploy"
       version:
         required: true
         type: string

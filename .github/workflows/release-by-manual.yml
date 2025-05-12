@@ -95,7 +95,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Milestone
+      - name: Close and create Milestone
         uses: radcortez/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

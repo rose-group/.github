@@ -9,17 +9,7 @@ on:
         required: false
         type: string
         default: ""
-        description: "Branch or tag to deploy"
-      version:
-        required: true
-        type: string
-        default: "0.0.1"
-        description: "Release version"
-      nextVersion:
-        required: true
-        type: string
-        default: "0.0.2-SNAPSHOT"
-        description: "Next version"
+        description: "Branch or tag to release"
 
 permissions:
   contents: write
@@ -32,23 +22,22 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Set Environment Variable
+      - name: Retrieve Project Metadata
+        uses: radcortez/project-metadata-action@main
+        id: metadata
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          metadata-file-path: '.github/project.yml'
+
+      - name: Set environment variables
         run: |
-          echo "REF=${DISPATCH_REF:-${CALL_REF:-${RELEASE_VERSION}}}" >> $GITHUB_ENV
-          echo "RELEASE_VERSION=${DISPATCH_VERSION:-${CALL_VERSION}}" >> $GITHUB_ENV
-          echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION:-${CALL_NEXT_VERSION}}" >> $GITHUB_ENV
-        env:
-          CALL_REF: ${{ inputs.ref }}
-          DISPATCH_REF: ${{ github.event.inputs.ref}}
-          CALL_VERSION: ${{ inputs.version }}
-          DISPATCH_VERSION: ${{ github.event.inputs.version}}
-          CALL_NEXT_VERSION: ${{ inputs.next-version }}
-          DISPATCH_NEXT_VERSION: ${{ github.event.inputs.next-version}}
+          echo "RELEASE_VERSION=${{steps.metadata.outputs.current-version}}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${{steps.metadata.outputs.next-version}}" >> $GITHUB_ENV
 
       - name: Checkout Source
         uses: actions/checkout@v4
         with:
-          ref: ${REF}
+          ref: ${{ inputs.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git User

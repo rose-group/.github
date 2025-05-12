@@ -48,18 +48,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate version
-        if: contains(github.event.inputs.version, 'SNAPSHOT')
-        run: |
-          echo '::error::Cannot release a SNAPSHOT version.'
-          exit 1
-
-      - name: Review Milestone
-        uses: radcortez/milestone-review-action@main
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          milestone-title: ${{github.event.inputs.version}}
-
       - name: Checkout Source
         uses: actions/checkout@v4
         with:
@@ -82,8 +70,6 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }} # macOS: gpg --armor --export-secret-key
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-
-
 
       - name: Set release version
         run: |
@@ -116,10 +102,3 @@ jobs:
           gh release create v${{ github.event.inputs.version }} --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Milestone
-        uses: radcortez/milestone-release-action@main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          milestone-title: ${{github.event.inputs.version}}
-          milestone-next: ${{github.event.inputs.nextVersion}}

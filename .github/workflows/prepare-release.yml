@@ -77,6 +77,7 @@ jobs:
       - name: Push changes to ${{github.base_ref}} branch and tag ${{env.CURRENT_VERSION}}
         run: |
           git push
+          git push --tag
 
       - uses: radcortez/milestone-release-action@main
         name: milestone release

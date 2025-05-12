@@ -10,6 +10,16 @@ on:
         type: string
         default: ""
         description: "Branch or tag to deploy"
+      version:
+        required: true
+        type: string
+        default: "0.0.1"
+        description: "Release version"
+      nextVersion:
+        required: true
+        type: string
+        default: "0.0.2-SNAPSHOT"
+        description: "Next version"
 
 permissions:
   contents: write
@@ -22,22 +32,23 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Retrieve Project Metadata
-        uses: radcortez/project-metadata-action@main
-        id: metadata
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          metadata-file-path: '.github/project.yml'
-
-      - name: Set environment variables
+      - name: Set Environment Variable
         run: |
-          echo "CURRENT_VERSION=${{steps.metadata.outputs.current-version}}" >> $GITHUB_ENV
-          echo "NEXT_VERSION=${{steps.metadata.outputs.next-version}}" >> $GITHUB_ENV
+          echo "REF=${DISPATCH_REF:-${CALL_REF:-${RELEASE_VERSION}}}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=${DISPATCH_VERSION:-${CALL_VERSION}}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION:-${CALL_NEXT_VERSION}}" >> $GITHUB_ENV
+        env:
+          CALL_REF: ${{ inputs.ref }}
+          DISPATCH_REF: ${{ github.event.inputs.ref}}
+          CALL_VERSION: ${{ inputs.version }}
+          DISPATCH_VERSION: ${{ github.event.inputs.version}}
+          CALL_NEXT_VERSION: ${{ inputs.next-version }}
+          DISPATCH_NEXT_VERSION: ${{ github.event.inputs.next-version}}
 
       - name: Checkout Source
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${REF}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git User
@@ -67,8 +78,8 @@ jobs:
 
       - name: Set release version
         run: |
-          ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
-          git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
+          ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Releasing ${RELEASE_VERSION}"
 
       - name: Publish to Central
         run: ${MAVEN_EXEC} -B -DskipTests -Prelease deploy
@@ -79,7 +90,7 @@ jobs:
 
       - name: Tag Release
         run: |
-          git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
+          git tag -a "v${RELEASE_VERSION}" -m "Release v${RELEASE_VERSION}"
 
       - name: Next Version
         run: |
@@ -93,7 +104,7 @@ jobs:
 
       - name: Create Release
         run: |
-          gh release create v${CURRENT_VERSION} --generate-notes
+          gh release create v${RELEASE_VERSION} --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -101,4 +112,4 @@ jobs:
         uses: radcortez/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          milestone-title: v${{ steps.metadata.outputs.current-version }}
+          milestone-title: v${RELEASE_VERSION}

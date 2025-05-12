@@ -100,4 +100,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           milestone-title: ${{ github.event.inputs.version }}
-          milestone-next: ${{ steps.event.inputs.next-version }}
+          milestone-next: ${{ steps.event.inputs.nextVersion }}

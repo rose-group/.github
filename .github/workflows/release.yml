@@ -6,30 +6,30 @@ on:
   # Called in the release workflow
   workflow_call:
     inputs:
-      branch:
-        description: "The branch to release."
-        required: true
+      ref:
+        required: false
         type: string
-        default: "main"
+        default: ""
+        description: The Git ref to checkout; defaults to the exact originating commit
       version:
-        description: "Release version"
         required: true
         type: string
         default: "0.0.1"
+        description: "Release version"
       nextVersion:
-        description: "Next version"
         required: true
         type: string
         default: "0.0.2-SNAPSHOT"
+        description: "Next version"
 
   # Can be triggered manually also
   workflow_dispatch:
     inputs:
-      branch:
+      ref:
         description: "The branch to release."
-        required: true
+        required: false
         type: string
-        default: "main"
+        default: ""
       version:
         description: "Release version"
         required: true
@@ -51,7 +51,7 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ inputs.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git User

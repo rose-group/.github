@@ -1,4 +1,4 @@
-name: Rose Perform Release
+name: Perform Release
 
 on:
   # Called in the release workflow
@@ -81,7 +81,7 @@ jobs:
         with:
           ref: ${{env.REF}} # The tag created by the release:prepare goal
 
-      - name: Set up JDK 21
+      - name: Set up JDK 8
         uses: actions/setup-java@v4
         with:
           distribution: zulu
@@ -114,13 +114,10 @@ jobs:
           path: ${{env.ARTIFACT_PATH}}
           retention-days: 3
 
-      - uses: actions/create-github-app-token@v2
-        id: app-token
-        name: Create GitHub App Token
-        with:
-          app-id: ${{ vars.CI_APP_ID }}
-          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
-          repositories: rose-release
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Invoke Rose Release workflow
         run: |
@@ -133,7 +130,7 @@ jobs:
 
           echo "RELEASE_WORKFLOW_RUN_NAME=Deploy ${ARTIFACT_NAME} ${RELEASE_VERSION} to Central" >> $GITHUB_ENV
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           GH_RUN_ID: ${{ github.run_id }}
           ARTIFACT_NAME: ${{ github.event.repository.name }}
@@ -150,7 +147,7 @@ jobs:
           echo "release-workflow-id=$RELEASE_WORKFLOW_ID" >> $GITHUB_OUTPUT
           echo "release-workflow-url=$RELEASE_WORKFLOW_URL" >> $GITHUB_OUTPUT
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Report Job Summary
         run: |
@@ -165,5 +162,5 @@ jobs:
         run: |
           gh run watch ${RELEASE_WORKFLOW_ID} -R rose-group/rose-release --exit-status
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_WORKFLOW_ID: ${{ steps.out.outputs.release-workflow-id }}

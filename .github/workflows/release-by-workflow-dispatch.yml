@@ -8,10 +8,12 @@ on:
       version:
         description: "Release version"
         required: true
+        type: string
         default: "0.0.1"
       nextVersion:
         description: "Next version"
         required: true
+        type: string
         default: "0.0.2-SNAPSHOT"
 
 permissions:

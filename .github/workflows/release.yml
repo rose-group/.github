@@ -9,14 +9,17 @@ on:
       branch:
         description: "The branch to release."
         required: true
+        type: string
         default: "main"
       version:
         description: "Release version"
         required: true
+        type: string
         default: "0.0.1"
       nextVersion:
         description: "Next version"
         required: true
+        type: string
         default: "0.0.2-SNAPSHOT"
 
   # Can be triggered manually also

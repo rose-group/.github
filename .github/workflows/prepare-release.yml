@@ -71,8 +71,8 @@ jobs:
 
       - name: Maven release ${{env.CURRENT_VERSION}}
         run: |
-          ${MAVEN_EXEC} -B release:prepare -Prelease -Dgpg.skip=true -DreleaseVersion=${CURRENT_VERSION} -DdevelopmentVersion=${NEXT_VERSION} -Drelease.arguments="-Dgpg.skip=true"
-          ${MAVEN_EXEC} -B release:clean
+          ${MAVEN_EXEC} -B -ntp release:prepare -Prelease -Dgpg.skip=true -DreleaseVersion=${CURRENT_VERSION} -DdevelopmentVersion=${NEXT_VERSION} -Drelease.arguments="-Dgpg.skip=true"
+          ${MAVEN_EXEC} -B -ntp release:clean
 
       - name: Push changes to ${{github.base_ref}} branch and tag ${{env.CURRENT_VERSION}}
         run: |

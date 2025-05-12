@@ -1,11 +1,18 @@
 # https://github.com/infinispan/infinispan/blob/15.2.1.Final/.github/workflows/tag.yml
 
-# 通过 .github/project.yml 触发 release
-
 name: Maven Release
 
 on:
   workflow_call:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
+        default: "0.0.1"
+      nextVersion:
+        description: "Next version"
+        required: true
+        default: "0.0.2-SNAPSHOT"
 
 permissions:
   contents: write
@@ -18,17 +25,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Retrieve Project Metadata
-        uses: radcortez/project-metadata-action@main
-        id: metadata
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          metadata-file-path: '.github/project.yml'
-
       - name: Set environment variables
         run: |
-          echo "RELEASE_VERSION=${{steps.metadata.outputs.current-version}}" >> $GITHUB_ENV
-          echo "NEXT_VERSION=${{steps.metadata.outputs.next-version}}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=${{github.event.inputs.version}}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${{github.event.inputs.nextVersion}}" >> $GITHUB_ENV
 
       - name: Checkout Source
         uses: actions/checkout@v4

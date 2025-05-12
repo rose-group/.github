@@ -28,14 +28,17 @@ on:
       branch:
         description: "The branch to release."
         required: true
+        type: string
         default: "main"
       version:
         description: "Release version"
         required: true
+        type: string
         default: "0.0.1"
       nextVersion:
         description: "Next version"
         required: true
+        type: string
         default: "0.0.2-SNAPSHOT"
 
 env:
@@ -50,6 +53,12 @@ jobs:
         run: |
           echo '::error::Cannot release a SNAPSHOT version.'
           exit 1
+
+      - name: Review Milestone
+        uses: radcortez/milestone-review-action@main
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          milestone-title: ${{github.event.inputs.version}}
 
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -74,11 +83,7 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }} # macOS: gpg --armor --export-secret-key
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-      - name: Review Milestone
-        uses: radcortez/milestone-review-action@main
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          milestone-title: ${{github.event.inputs.version}}
+
 
       - name: Set release version
         run: |

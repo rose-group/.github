@@ -65,12 +65,12 @@ jobs:
           ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
           git commit --no-verify -a -m "[CI Skip] Releasing ${RELEASE_VERSION}"
 
-#      - name: Publish to Central
-#        run: ${MAVEN_EXEC} -B -DskipTests -Prelease deploy
-#        env:
-#          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-#          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-#          MAVEN_GPG_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
+      - name: Publish to Central
+        run: ${MAVEN_EXEC} -B -DskipTests -Prelease deploy
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
 
       - name: Tag Release
         run: |

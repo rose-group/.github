@@ -10,16 +10,6 @@ on:
         type: string
         default: ""
         description: "Branch or tag to deploy"
-      version:
-        required: true
-        type: string
-        default: "0.0.1"
-        description: "Release version"
-      nextVersion:
-        required: true
-        type: string
-        default: "0.0.2-SNAPSHOT"
-        description: "Next version"
 
 permissions:
   contents: write
@@ -32,6 +22,18 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Retrieve Project Metadata
+        uses: radcortez/project-metadata-action@main
+        id: metadata
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          metadata-file-path: '.github/project.yml'
+
+      - name: Set environment variables
+        run: |
+          echo "CURRENT_VERSION=${{steps.metadata.outputs.current-version}}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${{steps.metadata.outputs.next-version}}" >> $GITHUB_ENV
+
       - name: Checkout Source
         uses: actions/checkout@v4
         with:
@@ -55,13 +57,21 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }} # macOS: gpg --armor --export-secret-key
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
+      - name: Detect Maven Wrapper
+        run: |
+          if [ -f mvnw ]; then
+            echo "MAVEN_EXEC=./mvnw" >> $GITHUB_ENV
+          else
+            echo "MAVEN_EXEC=mvn" >> $GITHUB_ENV
+          fi
+
       - name: Set release version
         run: |
-          mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${{ github.event.inputs.version }}
-          git commit --no-verify -a -m "[CI Skip] Releasing ${{ github.event.inputs.version }}"
+          ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
 
       - name: Publish to Central
-        run: mvn -B -DskipTests -Prelease deploy
+        run: ${MAVEN_EXEC} -B -DskipTests -Prelease deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -69,12 +79,12 @@ jobs:
 
       - name: Tag Release
         run: |
-          git tag -a "v${{ github.event.inputs.version }}" -m "Release v${{ github.event.inputs.version }}"
+          git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
 
       - name: Next Version
         run: |
-          mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${{ github.event.inputs.nextVersion }}
-          git commit --no-verify -a -m "[CI Skip] Next version ${{ github.event.inputs.nextVersion }}"
+          ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
 
       - name: Push changes
         run: |
@@ -83,6 +93,12 @@ jobs:
 
       - name: Create Release
         run: |
-          gh release create v${{ github.event.inputs.version }} --generate-notes
+          gh release create v${CURRENT_VERSION} --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Milestone
+        uses: radcortez/milestone-release-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          milestone-title: v${{ steps.metadata.outputs.current-version }}

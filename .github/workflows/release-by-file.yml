@@ -96,4 +96,4 @@ jobs:
         uses: radcortez/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          milestone-title: ${RELEASE_VERSION}
+          milestone-title: ${{steps.metadata.outputs.current-version}}

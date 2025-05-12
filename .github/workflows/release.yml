@@ -99,3 +99,10 @@ jobs:
           gh release create v${{ github.event.inputs.version }} --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Milestone
+        uses: radcortez/milestone-release-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          milestone-title: ${{github.event.inputs.version}}
+          milestone-next: ${{github.event.inputs.nextVersion}}

@@ -1,5 +1,7 @@
 # https://github.com/infinispan/infinispan/blob/15.2.1.Final/.github/workflows/tag.yml
 
+# 通过 .github/project.yml 触发 release
+
 name: Maven Release
 
 on:

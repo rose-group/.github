@@ -22,25 +22,6 @@ on:
         default: "0.0.2-SNAPSHOT"
         description: "Next version"
 
-  # Can be triggered manually also
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: "The branch to release."
-        required: false
-        type: string
-        default: ""
-      version:
-        description: "Release version"
-        required: true
-        type: string
-        default: "0.0.1"
-      nextVersion:
-        description: "Next version"
-        required: true
-        type: string
-        default: "0.0.2-SNAPSHOT"
-
 env:
   MAVEN_ARGS: -B -ntp
 

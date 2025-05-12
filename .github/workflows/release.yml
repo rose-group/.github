@@ -3,6 +3,23 @@
 name: Tag
 
 on:
+  # Called in the release workflow
+  workflow_call:
+    inputs:
+      branch:
+        description: "The branch to release."
+        required: true
+        default: "main"
+      version:
+        description: "Release version"
+        required: true
+        default: "0.0.1"
+      nextVersion:
+        description: "Next version"
+        required: true
+        default: "0.0.2-SNAPSHOT"
+
+  # Can be triggered manually also
   workflow_dispatch:
     inputs:
       branch:

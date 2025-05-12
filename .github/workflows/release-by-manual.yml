@@ -32,6 +32,12 @@ jobs:
           echo "RELEASE_VERSION=${{github.event.inputs.version}}" >> $GITHUB_ENV
           echo "NEXT_VERSION=${{github.event.inputs.nextVersion}}" >> $GITHUB_ENV
 
+      - name: Validate version
+        if: contains(env.RELEASE_VERSION, 'SNAPSHOT')
+        run: |
+          echo '::error::Cannot release a SNAPSHOT version.'
+          exit 1
+
       - name: Checkout Source
         uses: actions/checkout@v4
         with:

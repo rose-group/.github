@@ -1,0 +1,93 @@
+name: Rose Prepare Release
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
+        default: ''
+        description: The Git ref to checkout; defaults to the exact originating commit
+    # Map the workflow outputs to job outputs
+    outputs:
+      release-version:
+        description: "Released Version"
+        value: ${{ jobs.prepare-release.outputs.release-version }}
+      next-version:
+        description: "Next Version"
+        value: ${{ jobs.prepare-release.outputs.next-version }}
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    name: Prepare Release
+    if: ${{github.event.pull_request.merged == true}}
+    # Map the job outputs to step outputs
+    outputs:
+      release-version: ${{ steps.out.outputs.release-version }}
+      next-version: ${{ steps.out.outputs.next-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - uses: radcortez/project-metadata-action@main
+        name: Retrieve project metadata
+        id: metadata
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          metadata-file-path: '.github/project.yml'
+          local-file: true
+
+      - name: Set environment variables
+        run: |
+          echo "CURRENT_VERSION=${{steps.metadata.outputs.current-version}}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${{steps.metadata.outputs.next-version}}" >> $GITHUB_ENV
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 8
+          cache: 'maven'
+
+      - name: Detect Maven Wrapper
+        run: |
+          if [ -f mvnw ]; then
+            echo "MAVEN_EXEC=./mvnw" >> $GITHUB_ENV
+          else
+            echo "MAVEN_EXEC=mvn" >> $GITHUB_ENV
+          fi
+
+      - name: Maven release ${{env.CURRENT_VERSION}}
+        run: |
+          ${MAVEN_EXEC} -B release:prepare -Prelease -Dgpg.skip=true -DreleaseVersion=${CURRENT_VERSION} -DdevelopmentVersion=${NEXT_VERSION} -Drelease.arguments="-Dgpg.skip=true"
+          ${MAVEN_EXEC} -B release:clean
+
+      - name: Push changes to ${{github.base_ref}} branch and tag ${{env.CURRENT_VERSION}}
+        run: |
+          git push
+          git push origin ${CURRENT_VERSION}
+
+      - uses: radcortez/milestone-release-action@main
+        name: milestone release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          milestone-title: ${{steps.metadata.outputs.current-version}}
+          milestone-next: ${{steps.metadata.outputs.next-version}}
+
+      - name: Output release version
+        id: out
+        run: |
+          echo "release-version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+          echo "next-version=${NEXT_VERSION}" >> $GITHUB_OUTPUT

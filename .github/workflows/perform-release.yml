@@ -1,0 +1,169 @@
+name: Rose Perform Release
+
+on:
+  # Called in the release workflow
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        description: Tag version to perform release
+        type: string
+      ref:
+        description: 'Branch or tag to deploy'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run the release'
+        required: false
+        type: boolean
+        default: false
+
+  # Can be triggered manually also
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: Tag version to perform release
+        required: true
+      ref:
+        description: 'Branch or tag to deploy'
+        type: string
+        required: false
+      dry_run:
+        description: 'Dry run the release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  attestations: write
+  id-token: write
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  perform-release:
+    environment:
+      name: Release Repository
+      url: ${{ steps.out.outputs.release-workflow-url }}
+    outputs:
+      release-workflow-id: ${{ steps.out.outputs.release-workflow-id }}
+      release-workflow-url: ${{ steps.out.outputs.release-workflow-url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Dry Run Environment Variable
+        run: |
+          echo "DRY_RUN=${DISPATCH_DRY_RUN:-${CALL_DRY_RUN}}" >> $GITHUB_ENV
+        env:
+          CALL_DRY_RUN: ${{ inputs.dry_run }}
+          DISPATCH_DRY_RUN: ${{ github.event.inputs.dry_run}}
+      - name: Set Release Version Environment Variable
+        run: |
+          echo "RELEASE_VERSION=${DISPATCH_VERSION:-${CALL_VERSION}}" >> $GITHUB_ENV
+        env:
+          CALL_VERSION: ${{ inputs.version }}
+          DISPATCH_VERSION: ${{ github.event.inputs.version}}
+      - name: Set Ref Environment Variable
+        run: |
+          echo "REF=${DISPATCH_REF:-${CALL_REF:-${RELEASE_VERSION}}}" >> $GITHUB_ENV
+        env:
+          CALL_REF: ${{ inputs.ref }}
+          DISPATCH_REF: ${{ github.event.inputs.ref}}
+      - name: Set ARTIFACT_PATH Environment Variable
+        run: |
+          echo "ARTIFACT_PATH=${REPOSITORY_NAME}-${RELEASE_VERSION}.tar.gz" >> $GITHUB_ENV
+        env:
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{env.REF}} # The tag created by the release:prepare goal
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 8
+          cache: 'maven'
+
+      - name: Detect Maven Wrapper
+        run: |
+          if [ -f mvnw ]; then
+            echo "MAVEN_EXEC=./mvnw" >> $GITHUB_ENV
+          else
+            echo "MAVEN_EXEC=mvn" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy release ${{env.RELEASE_VERSION}}
+        run: $MAVEN_EXEC deploy -DperformRelease -DaltDeploymentRepository=local::file://${{ github.workspace }}/repository -DskipTests
+
+      - name: Tarball the artifacts
+        run: tar -czvf ${ARTIFACT_PATH} -C repository .
+
+      - name: Generate artifact attestation
+        id: attest_build_provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{env.ARTIFACT_PATH}}
+
+      - name: Upload assets
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{env.ARTIFACT_PATH}}
+          retention-days: 3
+
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        name: Create GitHub App Token
+        with:
+          app-id: ${{ vars.CI_APP_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+          repositories: rose-release
+
+      - name: Invoke Rose Release workflow
+        run: |
+          gh workflow run deploy-artifacts.yml -R rose-group/rose-release \
+            -f github_repository=${GH_REPO} \
+            -f run_id=${GH_RUN_ID} \
+            -f version=${RELEASE_VERSION} \
+            -f name=${ARTIFACT_NAME} \
+            -f dry_run=${DRY_RUN}
+
+          echo "RELEASE_WORKFLOW_RUN_NAME=Deploy ${ARTIFACT_NAME} ${RELEASE_VERSION} to Central" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          GH_RUN_ID: ${{ github.run_id }}
+          ARTIFACT_NAME: ${{ github.event.repository.name }}
+
+      - name: Output release version
+        id: out
+        run: |
+          # Wait for the deploy-artifacts.yml workflow to start
+          sleep 10
+          # Get the URL of the release workflow (MUST match the workflow's run-name)
+          RELEASE_WORKFLOW_DATA=$(gh run list --workflow deploy-artifacts.yml -R rose-group/rose-release --json databaseId,name,url -q ".[] | select(.name == \"${RELEASE_WORKFLOW_RUN_NAME}\")" --limit 1)
+          RELEASE_WORKFLOW_ID=$(jq -r '.databaseId' <<< $RELEASE_WORKFLOW_DATA)
+          RELEASE_WORKFLOW_URL=$(jq -r '.url' <<< $RELEASE_WORKFLOW_DATA)
+          echo "release-workflow-id=$RELEASE_WORKFLOW_ID" >> $GITHUB_OUTPUT
+          echo "release-workflow-url=$RELEASE_WORKFLOW_URL" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Report Job Summary
+        run: |
+          echo "## Deployment status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
+          echo "Monitor the artifacts being deployed to central here:" >> $GITHUB_STEP_SUMMARY
+          echo "- [${RELEASE_WORKFLOW_RUN_NAME}](${SUMMARY_URL})" >> $GITHUB_STEP_SUMMARY
+        env:
+          SUMMARY_URL: ${{ steps.out.outputs.release-workflow-url }}
+
+      - name: Wait for the release workflow to finish
+        run: |
+          gh run watch ${RELEASE_WORKFLOW_ID} -R rose-group/rose-release --exit-status
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASE_WORKFLOW_ID: ${{ steps.out.outputs.release-workflow-id }}

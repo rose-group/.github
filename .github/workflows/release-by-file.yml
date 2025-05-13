@@ -69,7 +69,7 @@ jobs:
       - name: Set Release version
         run: |
           ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
-          sed -e "s/[0-9]\+\.[0-9]\+\.[0-9]\+/${CURRENT_VERSION}/g" README.md
+          sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
           git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
 
       - name: Publish to Central

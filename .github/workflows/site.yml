@@ -49,5 +49,5 @@ jobs:
         uses: rose-group/actions-gh-pages@5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/staging
+          publish_dir: ./target/site
           commit_message: 'Update Maven Site'

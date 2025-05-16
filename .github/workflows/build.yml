@@ -36,10 +36,6 @@ jobs:
       - name: Build with Maven
         run: ${MAVEN_EXEC} verify
 
-      - name: Build Changelog
-        id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v5
-
   quality:
     needs: [ build ]
     if: github.event_name == 'push'

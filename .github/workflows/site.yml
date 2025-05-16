@@ -32,6 +32,7 @@ jobs:
           cache: maven
 
       - name: Maven Site
+        id: site
         run: |
           if [ "$MULTI_MODULES" = true ]; then
             mvn install site:site site:stage
@@ -49,5 +50,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: .
+          publish_dir: target/staging
           commit_message: 'Deploy to pages'

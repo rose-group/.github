@@ -26,8 +26,8 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "CURRENT_VERSION=${{steps.metadata.outputs.current-version}}" >> $GITHUB_ENV
-          echo "NEXT_VERSION=${{steps.metadata.outputs.next-version}}" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=${{ steps.metadata.outputs.current-version }}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${{ steps.metadata.outputs.next-version }}" >> $GITHUB_ENV
 
       - name: Validate current version
         if: contains(env.CURRENT_VERSION, 'SNAPSHOT')

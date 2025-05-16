@@ -43,14 +43,21 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
-      - name: Publish site to github pages
+      - name: Maven Site
         run: |
           if [ "$MULTI_MODULES" = true ]; then
-            mvn install site:site site:stage scm-publish:publish-scm -Dscmpublish.serverId=github
+            mvn install site:site site:stage
           else
-            mvn install site:site scm-publish:publish-scm -Dscmpublish.serverId=github
+            mvn install site:site
           fi
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Deploy Site
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./target/staging/
+          commit_message: 'Deploy sites to gh-pages'

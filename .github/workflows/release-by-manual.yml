@@ -34,9 +34,11 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
+          echo "PUBLISH=${DISPATCH_PUBLISH}" >> $GITHUB_ENV
           echo "CURRENT_VERSION=${DISPATCH_CURRENT_VERSION}" >> $GITHUB_ENV
           echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION}" >> $GITHUB_ENV
         env:
+          DISPATCH_PUBLISH: ${{ inputs.publish }}
           DISPATCH_CURRENT_VERSION: ${{ inputs.current-version }}
           DISPATCH_NEXT_VERSION: ${{ inputs.next-version }}
 
@@ -84,7 +86,7 @@ jobs:
           git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
 
       - name: Publish to Central
-        if: ${{ inputs.publish == true}}
+        if: ${{ env.DISPATCH_PUBLISH == true}}
         run: ${MAVEN_EXEC} -DskipTests -Prelease deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}

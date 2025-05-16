@@ -9,7 +9,7 @@ on:
         description: "Whether to publish to Central"
         required: false
         type: boolean
-        default: true
+        default: false
       current-version:
         description: "Release version"
         required: true

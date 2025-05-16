@@ -46,7 +46,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Deploy to gh-pages
-        uses: rose-group/actions-gh-pages@v4.0.1-0
+        uses: rose-group/actions-gh-pages@v4.0.1-1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/site

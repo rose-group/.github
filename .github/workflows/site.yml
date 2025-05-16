@@ -23,19 +23,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create gh-pages
-        run: |
-          git pull
-          
-          if git branch | grep -qw "gh-pages"; then
-            git branch -d gh-pages
-          fi
-          
-          git branch gh-pages
-          git checkout gh-pages
-          git push origin gh-pages --force
-          git checkout main
-
       - name: Java ${{ matrix.Java }}
         uses: actions/setup-java@v4
         with:

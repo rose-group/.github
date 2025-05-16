@@ -43,10 +43,6 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
-      - name: Maven Install
-        run: |
-          mvn install
-
       - name: Publish site to github pages
         run: |
           if [ "$MULTI_MODULES" = true ]; then

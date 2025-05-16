@@ -84,7 +84,7 @@ jobs:
           git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
 
       - name: Publish to Central
-        if: ${{ github.event.inputs.publish == true}}
+        if: ${{ inputs.publish == true}}
         run: ${MAVEN_EXEC} -DskipTests -Prelease deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}

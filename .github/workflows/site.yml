@@ -7,7 +7,7 @@ env:
   MAVEN_ARGS: -B -ntp
 
 jobs:
-  build:
+  site:
     runs-on: ubuntu-latest
 
     strategy:

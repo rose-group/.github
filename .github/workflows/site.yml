@@ -39,24 +39,30 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
           cache: maven
-
-      - name: Maven Site
-        id: site
-        run: |
-          if [ "$MULTI_MODULES" == true ]; then
-            mvn install site:site site:stage
-          else
-            mvn install site:site
-          fi
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Configure Git User
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Deploy to gh-pages
-        uses: rose-group/actions-gh-pages@v4.0.1-3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{ env.PUBLIC_DIR }}
-          commit_message: 'Update Maven Site'
+      - name: Maven Site
+        id: site
+        run: |
+          if [ "$MULTI_MODULES" == true ]; then
+            mvn install site:site site:stage scm-publish:publish-scm -Dscmpublish.serverId=github
+          else
+            mvn install site:site scm-publish:publish-scm -Dscmpublish.serverId=github
+          fi
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Deploy to gh-pages
+#        uses: rose-group/actions-gh-pages@v4.0.1-3
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          publish_dir: ${{ env.PUBLIC_DIR }}
+#          commit_message: 'Update Maven Site'

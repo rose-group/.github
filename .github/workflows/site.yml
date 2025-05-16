@@ -3,7 +3,7 @@ name: Publish Site with Maven
 on:
   workflow_call:
     inputs:
-      multi-modules:
+      multi_modules:
         description: "Multi modules ?"
         required: false
         type: boolean
@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Set Environment Variables
         run: |
-          echo "MULTI_MODULES=${{github.event.inputs.multi-modules}}" >> $GITHUB_ENV
+          echo "MULTI_MODULES=${{github.event.inputs.multi_modules}}" >> $GITHUB_ENV
           
           if [ "$MULTI_MODULES" = true ]; then
             echo "PUBLIC_DIR=target/staging" >> $GITHUB_ENV

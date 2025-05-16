@@ -21,9 +21,16 @@ jobs:
       - name: Create gh-pages
         run: |
           git pull
-          git branch -d gh-pages
+          
+          if git branch | grep -qw "gh-pages"; then
+            git branch -d gh-pages
+          fi
+          
           git branch gh-pages
-          git branch
+          git checkout gh-pages
+          git add .
+          git commit -m "Initial commit for gh-pages"
+          git checkout -
           git push origin gh-pages
 
       - name: Java ${{ matrix.Java }}

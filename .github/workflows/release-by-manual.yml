@@ -34,8 +34,11 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "CURRENT_VERSION=${{github.event.inputs.current-version}}" >> $GITHUB_ENV
-          echo "NEXT_VERSION=${{github.event.inputs.next-version}}" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=${DISPATCH_CURRENT_VERSION}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION}" >> $GITHUB_ENV
+        env:
+          DISPATCH_CURRENT_VERSION: ${{ inputs.current-version}}
+          DISPATCH_NEXT_VERSION: ${{ inputs.next-version}}
 
       - name: Validate version
         if: contains(env.CURRENT_VERSION, 'SNAPSHOT')
@@ -112,5 +115,5 @@ jobs:
         uses: rose-group/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          milestone-title: ${{ github.event.inputs.current-version }}
-          milestone-next: ${{ github.event.inputs.next-version }}
+          milestone-title: ${{ env.CURRENT_VERSION }}
+          milestone-next: ${{ env.NEXT_VERSION }}

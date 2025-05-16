@@ -27,7 +27,7 @@ jobs:
             echo "PUBLIC_DIR=target/site" >> $GITHUB_ENV
           fi
         env:
-          DISPATCH_MULTI_MODULES: ${{ github.event.inputs.multi_modules}}
+          DISPATCH_MULTI_MODULES: ${{ inputs.multi_modules}}
 
       - name: Checkout Source
         uses: actions/checkout@v4

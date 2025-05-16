@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "MULTI_MODULES=${DISPATCH_MULTI_MODULES}" >> $GITHUB_ENV
           
-          if [ "DISPATCH_MULTI_MODULES" == true ]; then
+          if [ "$DISPATCH_MULTI_MODULES" == true ]; then
             echo "PUBLIC_DIR=target/staging" >> $GITHUB_ENV
           else
             echo "PUBLIC_DIR=target/site" >> $GITHUB_ENV

@@ -52,7 +52,7 @@ jobs:
           cache-dependency-path: '**/pom.xml'
 
       - name: Build with docs and coverage
-        run: mvn -Pcoverage javadoc:javadoc
+        run: mvn -Pcoverage install javadoc:javadoc
 
       - name: Build with sonar
         run: mvn sonar:sonar -Psonar -Dsonar.token=${{secrets.SONAR_TOKEN}}

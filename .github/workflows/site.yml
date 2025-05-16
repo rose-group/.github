@@ -21,7 +21,7 @@ jobs:
       - name: Create gh-pages
         run: |
           git pull
-          git branch -D gh-pages
+          git branch -d gh-pages
           git branch gh-pages
           git branch
           git push origin gh-pages

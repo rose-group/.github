@@ -26,7 +26,7 @@ permissions:
   issues: write
 
 env:
-  MAVEN_ARGS: -B -ntp
+  MAVEN_ARGS: -B -U -ntp
 
 jobs:
   release:
@@ -82,7 +82,7 @@ jobs:
 
       - name: Publish to Central
         if: ${{ github.event.inputs.publish == true}}
-        run: ${MAVEN_EXEC} -B -DskipTests -Prelease deploy
+        run: ${MAVEN_EXEC} -DskipTests -Prelease deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -94,7 +94,7 @@ jobs:
 
       - name: Set Next Version
         run: |
-          ${MAVEN_EXEC} -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          ${MAVEN_EXEC} versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
           git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_VERSION}"
 
       - name: Push changes

@@ -37,6 +37,7 @@ jobs:
         run: |
           git checkout --orphan gh-pages
           git rm -rf .
+          git add .
           git commit -m "rm gh-pages"
           git push origin gh-pages
 

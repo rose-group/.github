@@ -2,6 +2,12 @@ name: Publish Site with Maven
 
 on:
   workflow_call:
+    inputs:
+      multi-modules:
+        description: "Multi modules ?"
+        required: false
+        type: boolean
+        default: false
 
 env:
   MAVEN_ARGS: -B -ntp
@@ -15,6 +21,10 @@ jobs:
         java: [ '8' ]
 
     steps:
+      - name: Set environment variables
+        run: |
+          echo "MULTI_MODULES=${{github.event.inputs.multi-modules}}" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -35,7 +45,12 @@ jobs:
 
       - name: Publish site to github pages
         run: |
-          mvn --update-snapshots clean site scm-publish:publish-scm -Dscmpublish.serverId=github
+          if [ "$MULTI_MODULES" = true ]; then
+            mvn --update-snapshots clean site:site site:stage scm-publish:publish-scm -Dscmpublish.serverId=github
+          else
+            mvn --update-snapshots clean site:site scm-publish:publish-scm -Dscmpublish.serverId=github
+          fi
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

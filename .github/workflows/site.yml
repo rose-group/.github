@@ -43,12 +43,16 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
+      - name: Maven Install
+        run: |
+          mvn install
+
       - name: Publish site to github pages
         run: |
           if [ "$MULTI_MODULES" = true ]; then
-            mvn --update-snapshots clean site:site site:stage scm-publish:publish-scm -Dscmpublish.serverId=github
+            mvn --update-snapshots install site:site site:stage scm-publish:publish-scm -Dscmpublish.serverId=github
           else
-            mvn --update-snapshots clean site:site scm-publish:publish-scm -Dscmpublish.serverId=github
+            mvn --update-snapshots install site:site scm-publish:publish-scm -Dscmpublish.serverId=github
           fi
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}

@@ -21,14 +21,14 @@ jobs:
         java: [ '8' ]
 
     steps:
-      - name: Set environment variables
+      - name: Set Environment Variables
         run: |
           echo "MULTI_MODULES=${{github.event.inputs.multi-modules}}" >> $GITHUB_ENV
 
-      - name: Checkout
+      - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Java ${{ matrix.Java }}
+      - name: Setup Java ${{ matrix.Java }}
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -54,10 +54,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Deploy Site
+      - name: Deploy to Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./target/staging/
-          commit_message: 'Deploy sites to gh-pages'
+          commit_message: 'Deploy to pages'

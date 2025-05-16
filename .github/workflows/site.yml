@@ -46,11 +46,6 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
-      - name: Config git user
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Publish site to github pages
         run: |
           mvn --update-snapshots clean site scm-publish:publish-scm -Dscmpublish.serverId=github

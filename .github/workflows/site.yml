@@ -9,10 +9,9 @@ on:
         type: boolean
         default: false
       site-dir:
-        publish:
-          description: "Sit dir"
-          required: true
-          type: string
+        description: "Sit dir"
+        required: true
+        type: string
 
 env:
   MAVEN_ARGS: -B -U -ntp

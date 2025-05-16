@@ -6,10 +6,6 @@ on:
 env:
   MAVEN_ARGS: -B -U -ntp
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build:
     runs-on: ubuntu-latest

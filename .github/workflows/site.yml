@@ -23,6 +23,7 @@ jobs:
           git pull
           git branch -D gh-pages
           git branch gh-pages
+          git branch
           git push origin gh-pages
 
       - name: Java ${{ matrix.Java }}

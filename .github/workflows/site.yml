@@ -10,7 +10,7 @@ on:
         default: false
 
 env:
-  MAVEN_ARGS: -B -ntp
+  MAVEN_ARGS: -B -U -ntp
 
 jobs:
   site:
@@ -50,9 +50,9 @@ jobs:
       - name: Publish site to github pages
         run: |
           if [ "$MULTI_MODULES" = true ]; then
-            mvn --update-snapshots install site:site site:stage scm-publish:publish-scm -Dscmpublish.serverId=github
+            mvn install site:site site:stage scm-publish:publish-scm -Dscmpublish.serverId=github
           else
-            mvn --update-snapshots install site:site scm-publish:publish-scm -Dscmpublish.serverId=github
+            mvn install site:site scm-publish:publish-scm -Dscmpublish.serverId=github
           fi
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}

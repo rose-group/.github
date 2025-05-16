@@ -12,7 +12,7 @@ on:
   workflow_call:
 
 env:
-  MAVEN_ARGS: -B -ntp
+  MAVEN_ARGS: -B -U -ntp
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

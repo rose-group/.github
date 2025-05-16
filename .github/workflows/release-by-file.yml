@@ -10,7 +10,7 @@ permissions:
   issues: write
 
 env:
-  MAVEN_ARGS: -B -e -ntp
+  MAVEN_ARGS: -B -ntp
 
 jobs:
   release:

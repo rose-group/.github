@@ -18,6 +18,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create gh-pages
+        run: |
+          git checkout gh-pages
+          git rm -rf .
+          git add .
+          git commit -m "rm gh-pages"
+          git push origin gh-pages
+          git checkout main
+
       - name: Java ${{ matrix.Java }}
         uses: actions/setup-java@v4
         with:
@@ -32,14 +41,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Create gh-pages
-        run: |
-          git checkout --orphan gh-pages
-          git rm -rf .
-          git add .
-          git commit -m "rm gh-pages"
-          git push origin gh-pages
 
       - name: Publish site to github pages
         run: |

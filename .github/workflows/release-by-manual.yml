@@ -37,8 +37,8 @@ jobs:
           echo "CURRENT_VERSION=${DISPATCH_CURRENT_VERSION}" >> $GITHUB_ENV
           echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION}" >> $GITHUB_ENV
         env:
-          DISPATCH_CURRENT_VERSION: ${{ inputs.current-version}}
-          DISPATCH_NEXT_VERSION: ${{ inputs.next-version}}
+          DISPATCH_CURRENT_VERSION: ${{ inputs.current-version }}
+          DISPATCH_NEXT_VERSION: ${{ inputs.next-version }}
 
       - name: Validate version
         if: contains(env.CURRENT_VERSION, 'SNAPSHOT')

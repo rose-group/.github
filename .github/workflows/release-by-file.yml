@@ -1,4 +1,5 @@
-# https://github.com/infinispan/infinispan/blob/15.2.1.Final/.github/workflows/tag.yml
+# https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/release.yml
+# https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/prepare-release.yml
 
 name: Maven Release
 

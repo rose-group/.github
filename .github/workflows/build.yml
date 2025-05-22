@@ -38,7 +38,7 @@ jobs:
 
   quality:
     needs: [ build ]
-    if: github.event_name == 'push'
+    if: "!contains(github.event.head_commit.message, '[CI Skip]') && !contains(github.event.pull_request.title, '[CI Skip]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

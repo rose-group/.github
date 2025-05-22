@@ -9,6 +9,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[CI Skip]') && !contains(github.event.pull_request.title, '[CI Skip]')"
     strategy:
       matrix:
         java: [ '8', '11', '17', '21' ]
@@ -33,7 +34,7 @@ jobs:
           fi
 
       - name: Build with Maven
-        run: ${MAVEN_EXEC} verify
+        run: ${MAVEN_EXEC} package
 
   quality:
     needs: [ build ]
@@ -52,10 +53,10 @@ jobs:
           cache-dependency-path: '**/pom.xml'
 
       - name: Build with docs and coverage
-        run: mvn -Pcoverage install javadoc:javadoc
+        run: mvn install javadoc:javadoc jacoco:report
 
       - name: Build with sonar
-        run: mvn sonar:sonar -Psonar -Dsonar.token=${{secrets.SONAR_TOKEN}}
+        run: mvn sonar:sonar -Dsonar.token=${{secrets.SONAR_TOKEN}} -Dsonar.projectKey=`${{ github.repository }} | cut -d'/' -f2`
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

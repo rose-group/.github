@@ -53,7 +53,7 @@ jobs:
           cache-dependency-path: '**/pom.xml'
 
       - name: Build with docs and coverage
-        run: mvn install javadoc:javadoc jacoco:report jacoco:report-integration
+        run: mvn install -Pcoverage javadoc:javadoc
 
       - name: Build with sonar
         run: mvn sonar:sonar -Dsonar.token=${{secrets.SONAR_TOKEN}} -Dsonar.projectKey=$(echo ${{ github.repository }} | cut -d'/' -f2)

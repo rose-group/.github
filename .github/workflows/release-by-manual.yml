@@ -106,7 +106,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release Milestone
-        uses: rose-group/milestone-release-action@main
+        uses: rosestack/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           milestone-title: ${{ env.CURRENT_VERSION }}

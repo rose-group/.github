@@ -14,7 +14,7 @@ on:
         description: "Next version"
         required: true
         type: string
-        default: "0.0.2-SNAPSHOT"
+        default: "0.0.2"
 
 permissions:
   contents: write
@@ -31,6 +31,7 @@ jobs:
         run: |
           echo "CURRENT_VERSION=${DISPATCH_CURRENT_VERSION}" >> $GITHUB_ENV
           echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION}" >> $GITHUB_ENV
+          echo "NEXT_BRANCH=$(echo ${DISPATCH_NEXT_VERSION} | sed 's/-SNAPSHOT//')" >> $GITHUB_ENV
         env:
           DISPATCH_CURRENT_VERSION: ${{ inputs.current-version }}
           DISPATCH_NEXT_VERSION: ${{ inputs.next-version }}
@@ -63,9 +64,9 @@ jobs:
 
       - name: Create Branch
         run: |
-          git branch -m ${NEXT_VERSION}
+          git branch -m ${NEXT_BRANCH}
           mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
-          git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_VERSION}"
+          git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_BRANCH}"
           git push origin $(git rev-parse --abbrev-ref HEAD)
 
       - name: Release Milestone
@@ -73,4 +74,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           milestone-title: ${{ env.CURRENT_VERSION }}
-          milestone-next: ${{ env.NEXT_VERSION }}
+          milestone-next: ${{ env.NEXT_BRANCH }}

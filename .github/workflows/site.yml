@@ -44,11 +44,11 @@ jobs:
 
       - name: Maven Site
         run: |
-          if [ "$MULTI_MODULES" == true ]; then
-            mvn install site:site site:stage scm-publish:publish-scm
-          else
-            mvn install site:site scm-publish:publish-scm
-          fi
+#          if [ "$MULTI_MODULES" == true ]; then
+          mvn install site:site site:stage scm-publish:publish-scm
+#          else
+#            mvn install site:site scm-publish:publish-scm
+#          fi
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,53 @@
+#
+# organization wide configuration for release-drafter
+#
+
+name-template: v$RESOLVED_VERSION
+tag-template: v$RESOLVED_VERSION
+version-template: $COMPLETE
+
+categories:
+  - title: ':boom: Breaking changes'
+    labels:
+      - 'breaking changes'
+
+  - title: ':fire: New features'
+    labels:
+      - 'enhancement'
+
+  - title: ':exclamation: Deprecated features'
+    labels:
+      - 'deprecation'
+
+  - title: ':lady_beetle: Bug Fixes'
+    labels:
+      - 'bug'
+
+  - title: ':hammer: Maintenance'
+    labels:
+      - 'code quality'
+      - 'documentation'
+
+  - title: ':toolbox: Dependency updates'
+    labels:
+      -  'dependencies'
+
+change-template: '- $TITLE ([#$NUMBER]($URL)) @$AUTHOR'
+
+sort-direction: 'ascending'
+
+exclude-contributors:
+  - 'dependabot'
+  - 'dependabot[bot]'
+  - 'GitHub Action'
+
+exclude-labels:
+  - 'invalid'
+
+template: |
+  # What's Changed
+
+  $CHANGES
+
+  # :heart: Thanks
+  Many thanks for collaboration on this release for: $CONTRIBUTORS

@@ -64,12 +64,9 @@ jobs:
       - name: Create Branch
         run: |
           git branch -m ${NEXT_VERSION}
-          git commit --no-verify -a -m "[CI Skip] New Branch ${NEXT_VERSION}"
-
-      - name: Set Next Version
-        run: |
           mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
           git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_VERSION}"
+          git push origin $(git rev-parse --abbrev-ref HEAD)
 
       - name: Release Milestone
         uses: rosestack/milestone-release-action@main

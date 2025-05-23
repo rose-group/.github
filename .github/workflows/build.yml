@@ -35,7 +35,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 jobs:
-  build:
+  verify:
     name: ${{ matrix.os.label }} jdk-${{ matrix.java }}-${{ matrix.java-dist }} mvn-${{ matrix.maven }}
     runs-on: ${{ matrix.os.name }}
     continue-on-error: ${{ matrix.os.can-fail }}

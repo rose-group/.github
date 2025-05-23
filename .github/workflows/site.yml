@@ -45,7 +45,7 @@ jobs:
       - name: Maven Site
         run: |
 #          if [ "$MULTI_MODULES" == true ]; then
-          mvn install site:site site:stage scm-publish:publish-scm
+          mvn package site:site site:stage scm-publish:publish-scm -DskipTests
 #          else
 #            mvn install site:site scm-publish:publish-scm
 #          fi

@@ -70,14 +70,14 @@ jobs:
 
       - name: sonar setup
         id: sonar
-        run: echo "mvn-args=sonar:sonar -P coverage -Dsonar.token=${{secrets.SONAR_TOKEN}} -Dsonar.projectKey=$(echo ${{ github.repository }} | cut -d'/' -f2)" >> $GITHUB_OUTPUT
+        run: echo "mvn-args=sonar:sonar -P coverage -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
         if: >
           matrix.os.name == 'ubuntu-latest'
           && matrix.java == '17'
           && startsWith( github.ref, 'refs/heads/')
 
       - name: Build with Maven
-        run: mvn package ${{ steps.sonar.outputs.mvn-args }}
+        run: mvn verify ${{ steps.sonar.outputs.mvn-args }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

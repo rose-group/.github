@@ -1,7 +1,7 @@
 # https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/release.yml
 # https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/prepare-release.yml
 
-name: Maven Release
+name: Maven Release By File
 
 on:
   workflow_call:
@@ -54,8 +54,8 @@ jobs:
 
       - name: Configure Git User
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
 
       - name: Set Release version
         run: |

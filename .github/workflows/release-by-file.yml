@@ -12,3 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: rosestack/maven-release-by-file-action@v1
+        with:
+          gpg-secret-key: ${{secrets.GPG_SECRET_KEY}}
+          signing-passphrase: ${{secrets.GPG_SECRET_KEY}}
+          ossrh-username: ${{secrets.OSSRH_USERNAME}}
+          ossrh-password: ${{secrets.OSSRH_PASSWORD}}
+          github-token: ${{secrets.GITHUB_TOKEN}}

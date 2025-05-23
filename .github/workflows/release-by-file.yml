@@ -53,14 +53,6 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }} # macOS: gpg --armor --export-secret-key
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-      - name: Detect Maven Wrapper
-        run: |
-          if [ -f mvnw ]; then
-            echo "MAVEN_EXEC=./mvnw" >> $GITHUB_ENV
-          else
-            echo "MAVEN_EXEC=mvn" >> $GITHUB_ENV
-          fi
-
       - name: Configure Git User
         run: |
           git config --global user.name "github-actions[bot]"
@@ -68,12 +60,12 @@ jobs:
 
       - name: Set Release version
         run: |
-          ${MAVEN_EXEC} versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
           git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
 
       - name: Publish to Central
-        run: ${MAVEN_EXEC} -DskipTests -Prelease deploy
+        run: mvn -DskipTests -Prelease deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -85,7 +77,7 @@ jobs:
 
       - name: Set Next Version
         run: |
-          ${MAVEN_EXEC} versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
           git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_VERSION}"
 
       - name: Push changes

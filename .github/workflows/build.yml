@@ -68,14 +68,6 @@ jobs:
           java-version: ${{ matrix.java-matrix }}
           cache: maven
 
-      - name: Detect Maven Wrapper
-        run: |
-          if [ -f mvnw ]; then
-            echo "MAVEN_EXEC=./mvnw" >> $GITHUB_ENV
-          else
-            echo "MAVEN_EXEC=mvn" >> $GITHUB_ENV
-          fi
-
       - name: sonar setup
         id: sonar
         run: echo "mvn-args=sonar:sonar -P coverage -Dsonar.token=${{secrets.SONAR_TOKEN}} -Dsonar.projectKey=$(echo ${{ github.repository }} | cut -d'/' -f2)" >> $GITHUB_OUTPUT
@@ -85,7 +77,7 @@ jobs:
           && startsWith( github.ref, 'refs/heads/')
 
       - name: Build with Maven
-        run: ${MAVEN_EXEC} package ${{ steps.sonar.outputs.mvn-args }}
+        run: mvn package ${{ steps.sonar.outputs.mvn-args }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

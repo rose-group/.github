@@ -192,3 +192,10 @@ jobs:
           tag: ${{ env.TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Milestone
+        uses: rosestack/milestone-release-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          milestone-title: ${{ env.CURRENT_VERSION }}
+          milestone-next: ${{ env.NEXT_VERSION }}

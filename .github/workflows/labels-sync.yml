@@ -1,0 +1,35 @@
+name: labels-sync
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/labels.yml'
+      - '.github/workflows/labels-sync.yml'
+
+concurrency: labels-sync
+
+jobs:
+
+  sync:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - rosestack/rose-build
+          - rosestack/rose
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync
+        uses: micnncim/action-label-syncer@v1.3.0
+        with:
+          token: ${{ secrets.TECH_TOKEN }}
+          repository: ${{ matrix.repo }}
+          prune: false

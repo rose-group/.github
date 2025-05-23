@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    name: Release
-    if: ${{ github.event.pull_request.merged == true}}
-    uses: rosestack/maven-release-by-file-action@v1
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rosestack/maven-release-by-file-action@v1
+        secrets: inherit

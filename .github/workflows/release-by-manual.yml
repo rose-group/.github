@@ -14,9 +14,10 @@ on:
 
 jobs:
   release:
-    name: Release
-    uses: rosestack/maven-release-by-manual-action@v1
-    secrets: inherit
-    with:
-      current-version: ${{github.event.inputs.current-version}}
-      next-version: ${{github.event.inputs.next-version}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rosestack/maven-release-by-manual-action@v1
+        secrets: inherit
+        with:
+          current-version: ${{github.event.inputs.current-version}}
+          next-version: ${{github.event.inputs.next-version}}

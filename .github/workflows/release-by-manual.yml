@@ -15,7 +15,7 @@ on:
 jobs:
   release:
     name: Release
-    uses: rosestack/maven-release-by-manual-action@main
+    uses: rosestack/maven-release-by-manual-action@v1
     secrets: inherit
     with:
       current-version: ${{github.event.inputs.current-version}}

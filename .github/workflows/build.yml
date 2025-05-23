@@ -134,12 +134,16 @@ jobs:
           distribution: ${{ inputs.java-dist-default }}
           cache: maven
           server-id: central
-          server-username: ${{ secrets.OSSRH_USERNAME }}
-          server-password: ${{ secrets.OSSRH_PASSWORD }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }} # macOS: gpg --armor --export-secret-key
-          gpg-passphrase: ${{ secrets.SIGNING_PASSPHRASE }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - run: mvn -DskipTests -Prelease deploy
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
 
   site:
     name: Site

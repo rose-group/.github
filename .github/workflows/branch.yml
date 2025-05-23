@@ -14,7 +14,7 @@ on:
         description: "Next version"
         required: true
         type: string
-        default: "0.0.2"
+        default: "0.0.2-SNAPSHOT"
 
 permissions:
   contents: write
@@ -61,12 +61,14 @@ jobs:
       - name: Create Tag
         run: |
           git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
+          git push --tags
+          git push origin $(git rev-parse --abbrev-ref HEAD)
 
       - name: Create Branch
         run: |
           git branch -m ${NEXT_BRANCH}
           mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
-          git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_BRANCH}"
+          git commit --no-verify -a -m "[CI Skip] Next version v${NEXT_VERSION}"
           git push origin $(git rev-parse --abbrev-ref HEAD)
 
       - name: Release Milestone

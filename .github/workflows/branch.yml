@@ -14,7 +14,7 @@ on:
         description: "Next version"
         required: true
         type: string
-        default: "0.0.2"
+        default: "0.0.2-SNAPSHOT"
 
 permissions:
   contents: write

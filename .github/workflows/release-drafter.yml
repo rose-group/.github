@@ -50,9 +50,7 @@ jobs:
     permissions:
       contents: write
     needs: detect-version
-
     steps:
-
       - uses: release-drafter/release-drafter@v6.1.0
         with:
           version: ${{ needs.detect-version.outputs.version }}

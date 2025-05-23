@@ -20,3 +20,8 @@ jobs:
         with:
           current-version: ${{github.event.inputs.current-version}}
           next-version: ${{github.event.inputs.next-version}}
+          gpg-secret-key: ${{secrets.GPG_SECRET_KEY}}
+          signing-passphrase: ${{secrets.GPG_SECRET_KEY}}
+          ossrh-username: ${{secrets.OSSRH_USERNAME}}
+          ossrh-password: ${{secrets.OSSRH_PASSWORD}}
+          github-token: ${{secrets.GITHUB_TOKEN}}

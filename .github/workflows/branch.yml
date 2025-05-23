@@ -56,8 +56,8 @@ jobs:
         run: |
           mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
-          git commit --no-verify -a -m "Releasing ${CURRENT_VERSION}"
           if git status --porcelain | grep -q .; then
+            git commit --no-verify -a -m "Releasing ${CURRENT_VERSION}"
             git push origin $(git rev-parse --abbrev-ref HEAD)
           fi
 

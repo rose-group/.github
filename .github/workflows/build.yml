@@ -100,10 +100,9 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  site:
-    name: Site
-    concurrency: site
-    if: startsWith(github.ref, 'refs/tags/')
+  test:
+    name: Test
+    concurrency: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
@@ -115,18 +114,15 @@ jobs:
           java-version: ${{ inputs.java-default }}
           distribution: ${{ inputs.java-dist-default }}
           cache: maven
-          server-id: github
-          server-username: ${{ secrets.GITHUB_ACTOR }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: mvn package site site:stage scm-publish:publish-scm
+      - run: mvn test
 
   deploy:
     name: Deploy
     concurrency: deploy
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    needs: [ verify, site ]
+    needs: [ verify, test ]
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -145,12 +141,34 @@ jobs:
 
       - run: mvn -DskipTests -Prelease deploy
 
+  site:
+    name: Site
+    concurrency: site
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    needs: [ deploy ]
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ inputs.java-default }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java-default }}
+          distribution: ${{ inputs.java-dist-default }}
+          cache: maven
+          server-id: github
+          server-username: ${{ secrets.GITHUB_ACTOR }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: mvn package site site:stage scm-publish:publish-scm
+
   publish-release:
     name: Publish Release
     concurrency: release-drafter
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    needs: [ deploy ]
+    needs: [ site ]
     steps:
       - name: Set environment variables
         run: |

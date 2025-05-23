@@ -61,11 +61,11 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup Java ${{ matrix.Java-matrix }}
+      - name: Setup Java ${{ matrix.Java }}
         uses: actions/setup-java@v4
         with:
           distribution: ${{ matrix.java-dist }}
-          java-version: ${{ matrix.java-matrix }}
+          java-version: ${{ matrix.java }}
           cache: maven
 
       - name: sonar setup

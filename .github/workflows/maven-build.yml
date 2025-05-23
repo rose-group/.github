@@ -24,9 +24,6 @@ on:
         type: string
 
     secrets:
-      SONAR_TOKEN:
-        required: true
-
       OSSRH_USERNAME:
         required: true
 
@@ -37,6 +34,9 @@ on:
         required: true
 
       SIGNING_PASSPHRASE:
+        required: true
+
+      SONAR_TOKEN:
         required: true
 
 env:

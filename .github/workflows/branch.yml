@@ -1,6 +1,6 @@
 # https://github.com/infinispan/infinispan/blob/15.2.1.Final/.github/workflows/tag.yml
 
-name: Create Branch
+name: Create Next Branch
 
 on:
   workflow_call:
@@ -56,6 +56,10 @@ jobs:
           mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
           git commit --no-verify -a -m "[CI Skip] Releasing ${CURRENT_VERSION}"
+
+      - name: Create Tag
+        run: |
+          git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
 
       - name: Create Branch
         run: |

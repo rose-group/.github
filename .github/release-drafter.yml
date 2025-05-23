@@ -39,7 +39,7 @@ sort-direction: 'ascending'
 exclude-contributors:
   - 'dependabot'
   - 'dependabot[bot]'
-  - 'GitHub Action'
+  - 'github-actions'
 
 exclude-labels:
   - 'invalid'

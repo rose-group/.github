@@ -57,13 +57,15 @@ jobs:
           mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
           git commit --no-verify -a -m "Releasing ${CURRENT_VERSION}"
+          if git status --porcelain | grep -q .; then
+            git push origin $(git rev-parse --abbrev-ref HEAD)
+          fi
 
       - name: Create Tag
         run: |
           git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
           git push --tags
-          git push origin $(git rev-parse --abbrev-ref HEAD)
-
+          
       - name: Create Branch
         run: |
           git branch -m ${NEXT_BRANCH}

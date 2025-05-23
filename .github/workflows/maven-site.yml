@@ -32,8 +32,8 @@ jobs:
           java-version: ${{ inputs.Java }}
           cache: maven
           server-id: github
-          server-username: ${{ secrets.GITHUB_ACTOR }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Configure Git User
         run: |
@@ -43,3 +43,6 @@ jobs:
       - name: Maven Site
         run: |
           mvn package site:site site:stage scm-publish:publish-scm
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

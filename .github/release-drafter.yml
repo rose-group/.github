@@ -14,6 +14,8 @@ categories:
   - title: ':fire: New features'
     labels:
       - 'enhancement'
+      - 'feature'
+      - 'feat'
 
   - title: ':exclamation: Deprecated features'
     labels:
@@ -22,6 +24,7 @@ categories:
   - title: ':lady_beetle: Bug Fixes'
     labels:
       - 'bug'
+      - 'bugfix'
 
   - title: ':hammer: Maintenance'
     labels:
@@ -45,7 +48,7 @@ exclude-labels:
   - 'invalid'
 
 template: |
-  # What's Changed
+  ## What's Changed
 
   $CHANGES
 

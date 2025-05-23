@@ -2,27 +2,66 @@ name: Maven Build
 
 on:
   workflow_call:
+    inputs:
+      java-matrix:
+        default: '["8", "11", "17", "21"]'
+        required: false
+        type: string
+
+      java-default:
+        default: '8'
+        required: false
+        type: string
+
+      java-dist-matrix:
+        default: '["zulu"]'
+        required: false
+        type: string
+
+      java-dist-default:
+        default: 'zulu'
+        required: false
+        type: string
 
 env:
   MAVEN_ARGS: -B -U -ntp
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os.label }} jdk-${{ matrix.java }}-${{ matrix.java-dist }} mvn-${{ matrix.maven }}
+    runs-on: ${{ matrix.os.name }}
+    continue-on-error: ${{ matrix.os.can-fail }}
     if: "!contains(github.event.head_commit.message, '[CI Skip]') && !contains(github.event.pull_request.title, '[CI Skip]')"
+
     strategy:
+      fail-fast: false
       matrix:
-        java: [ '8', '11', '17', '21' ]
+        os:
+          - name: ubuntu-latest
+            label: Linux
+            can-fail: false
+          - name: windows-latest
+            label: Windows
+            can-fail: false
+          - name: macOS-latest
+            label: macOS
+            can-fail: true
+        java: ${{ fromJSON( inputs.java-matrix ) }}
+        java-dist: ${{ fromJSON( inputs.java-dist-matrix ) }}
 
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup Java ${{ matrix.Java }}
+      - name: Setup Java ${{ matrix.Java-matrix }}
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.java }}
+          distribution: ${{ matrix.java-dist }}
+          java-version: ${{ matrix.java-matrix }}
           cache: maven
 
       - name: Detect Maven Wrapper
@@ -33,32 +72,22 @@ jobs:
             echo "MAVEN_EXEC=mvn" >> $GITHUB_ENV
           fi
 
+      - name: sonar setup
+        id: sonar
+        run: echo "mvn-args=sonar:sonar -P coverage -Dsonar.token=${{secrets.SONAR_TOKEN}} -Dsonar.projectKey=$(echo ${{ github.repository }} | cut -d'/' -f2)" >> $GITHUB_OUTPUT
+        if: >
+          matrix.os.name == 'ubuntu-latest'
+          && matrix.java == '17'
+          && startsWith( github.ref, 'refs/heads/')
+
       - name: Build with Maven
-        run: ${MAVEN_EXEC} package
-
-  quality:
-    needs: [ build ]
-    if: "!contains(github.event.head_commit.message, '[CI Skip]') && !contains(github.event.pull_request.title, '[CI Skip]')"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-          cache: 'maven'
-          cache-dependency-path: '**/pom.xml'
-
-      - name: Build with docs and coverage
-        run: mvn install -Pcoverage javadoc:javadoc
-
-      - name: Build with sonar
-        run: mvn sonar:sonar -Dsonar.token=${{secrets.SONAR_TOKEN}} -Dsonar.projectKey=$(echo ${{ github.repository }} | cut -d'/' -f2)
+        run: ${MAVEN_EXEC} package ${{ steps.sonar.outputs.mvn-args }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
+        if: >
+          matrix.os.name == 'ubuntu-latest'
+          && matrix.java == '17'
+          && startsWith( github.ref, 'refs/heads/')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

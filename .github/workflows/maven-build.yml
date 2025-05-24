@@ -82,7 +82,7 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: maven
 
-      - name: sonar setup
+      - name: Sonar Setup
         id: sonar
         run: echo "mvn-args=sonar:sonar -P coverage -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
         if: >

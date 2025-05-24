@@ -32,4 +32,4 @@ jobs:
 
       - name: Maven Test
         run: |
-          mvn package
+          mvn test

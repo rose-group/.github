@@ -43,6 +43,7 @@ exclude-contributors:
   - 'dependabot'
   - 'dependabot[bot]'
   - 'github-actions'
+  - 'github-actions[bot]'
 
 exclude-labels:
   - 'invalid'

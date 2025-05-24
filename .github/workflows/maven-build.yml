@@ -91,7 +91,7 @@ jobs:
           && startsWith( github.ref, 'refs/heads/')
 
       - name: Build with Maven
-        run: mvn verify ${{ steps.sonar.outputs.mvn-args }} -DskipTests
+        run: mvn verify ${{ steps.sonar.outputs.mvn-args }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

@@ -1,5 +1,3 @@
-# https://www.lorenzobettini.it/2020/01/publishing-a-maven-site-to-github-pages
-
 name: Maven Test
 
 on:

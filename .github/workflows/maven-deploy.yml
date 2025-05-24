@@ -1,4 +1,4 @@
-# https://www.lorenzobettini.it/2020/01/publishing-a-maven-site-to-github-pages
+# https://github.com/s4u/.github/blob/master/.github/workflows/maven-build.yml
 
 name: Maven Deploy
 
@@ -25,7 +25,7 @@ on:
       GPG_SECRET_KEY:
         required: true
 
-      SIGNING_PASSPHRASE:
+      GPG_PASSPHRASE:
         required: true
 
 env:
@@ -55,4 +55,4 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

@@ -50,7 +50,7 @@ concurrency:
 
 jobs:
   verify:
-    name: ${{ matrix.os.label }} jdk-${{ matrix.java }}-${{ matrix.java-dist }} mvn-${{ matrix.maven }}
+    name: ${{ matrix.os.label }} jdk-${{ matrix.java }}-${{ matrix.java-dist }}
     runs-on: ${{ matrix.os.name }}
     continue-on-error: ${{ matrix.os.can-fail }}
     if: "!contains(github.event.head_commit.message, '[CI Skip]') && !contains(github.event.pull_request.title, '[CI Skip]')"

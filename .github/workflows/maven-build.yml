@@ -6,7 +6,7 @@ on:
   workflow_call:
     inputs:
       java-matrix:
-        default: '["8", "11", "17", "21"]'
+        default: '["8", "11", "17", "21", "24"]'
         required: false
         type: string
 
@@ -84,7 +84,7 @@ jobs:
 
       - name: Sonar Setup
         id: sonar
-        run: echo "mvn-args=sonar:sonar -P coverage -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
+        run: echo "mvn-args=sonar:sonar -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
         if: >
           matrix.os.name == 'ubuntu-latest'
           && matrix.java == '17'

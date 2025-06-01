@@ -87,7 +87,6 @@ jobs:
       - name: Build and Publish Docker Image
         run: |
           mvn spring-boot:build-image -DskipTests
-          export image-name = ${{ inputs.image-name || env.IMAGE_NAME }}
-          docker tag $image-name $image-name:$TAG
-          echo "Pushing the image $image-name to Docker Hub..."
-          docker push --all-tags $image-name
+          docker tag ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:$TAG
+          echo "Pushing the image ${{ env.IMAGE_NAME }} to Docker Hub..."
+          docker push --all-tags ${{ env.IMAGE_NAME }}

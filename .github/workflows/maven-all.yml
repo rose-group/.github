@@ -95,7 +95,7 @@ jobs:
       sonar-organization: ${{ inputs.sonar-organization }}
 
   deploy:
-    uses: ./.github/workflows/maven-deoloy.yml
+    uses: ./.github/workflows/maven-deploy.yml
     secrets: inherit
     with:
       java-default: ${{ inputs.java-default }}

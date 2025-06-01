@@ -1,6 +1,6 @@
 # https://github.com/kanezi/boot-render-deploy/blob/master/.github/workflows/docker-publish.yml
 
-name: Maven Build and Docker
+name: Maven Docker
 
 on:
   workflow_call:

@@ -25,6 +25,11 @@ on:
         required: false
         type: string
 
+      sonar-host:
+        default: 'https://sonarcloud.io/'
+        required: false
+        type: string
+
       sonar-organization:
         default: 'rosestack'
         required: false
@@ -61,7 +66,7 @@ on:
         type: string
 
       java-default:
-        description:  Java Default Version
+        description: Java Default Version
         default: '8'
         required: false
         type: string
@@ -70,6 +75,12 @@ on:
         description: Java Default Distribution
         default: 'zulu'
         required: false
+
+      sonar-host:
+        description: Sonar Host
+        default: 'https://sonarcloud.io/'
+        required: false
+        type: string
 
       sonar-organization:
         description: Sonar Organization
@@ -120,7 +131,7 @@ jobs:
 
       - name: Sonar Setup
         id: sonar
-        run: echo "mvn-args=sonar:sonar -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.organization=${{inputs.sonar-organization}} -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
+        run: echo "mvn-args=sonar:sonar -Dsonar.host.url=${{inputs.sonar-host}} -Dsonar.organization=${{inputs.sonar-organization}} -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
         if: >
           matrix.os.name == 'ubuntu-latest'
           && matrix.java == '17'

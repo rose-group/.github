@@ -58,5 +58,6 @@ jobs:
           echo "run id | $GITHUB_RUN_ID" >> $GITHUB_STEP_SUMMARY
           echo "actor | $GITHUB_ACTOR" >> $GITHUB_STEP_SUMMARY
           echo "repository|$GITHUB_REPOSITORY" >> $GITHUB_STEP_SUMMARY
-          echo "branch|$GITHUB_REF" >> $GITHUB_STEP_SUMMARY
+          echo "ref|$GITHUB_REF" >> $GITHUB_STEP_SUMMARY
+          echo "ref name|$GITHUB_REF_NAME" >> $GITHUB_STEP_SUMMARY
           echo "os|$RUNNER_OS" >> $GITHUB_STEP_SUMMARY

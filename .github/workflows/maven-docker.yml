@@ -18,11 +18,13 @@ on:
   workflow_dispatch:
     inputs:
       java-default:
+        description: Java version to use
         default: '8'
         required: false
         type: string
 
       java-dist-default:
+        description: Java distribution to use
         default: 'zulu'
         required: false
         type: string

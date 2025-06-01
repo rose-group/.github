@@ -44,21 +44,25 @@ on:
   workflow_dispatch:
     inputs:
       java-matrix:
+        description: Java Version
         default: '["8", "11", "17", "21", "24"]'
         required: false
         type: string
 
       java-dist-matrix:
+        description: Java Distribution
         default: '["zulu"]'
         required: false
         type: string
 
       java-default:
+        description:  Java Default Version
         default: '8'
         required: false
         type: string
 
       java-dist-default:
+        description: Java Default Distribution
         default: 'zulu'
         required: false
 
@@ -105,7 +109,7 @@ jobs:
 
       - name: Sonar Setup
         id: sonar
-        run: echo "mvn-args=sonar:sonar -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
+        run: echo "mvn-args=sonar:sonar -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.organization=${{ secrets.GITHUB_ACTOR }} -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
         if: >
           matrix.os.name == 'ubuntu-latest'
           && matrix.java == '17'

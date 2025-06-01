@@ -12,7 +12,7 @@
     <artifactId>test</artifactId>
     <version>0.0.3-SNAPSHOT</version>
 
-    <description>Github Action</description>
+    <description>Github Action Templates</description>
     <url>https://rosestack.github.io/.github</url>
     <inceptionYear>2025</inceptionYear>
 

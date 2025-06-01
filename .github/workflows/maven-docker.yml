@@ -45,9 +45,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
-#  IMAGE_NAME: ${{ github.repository }}
-  IMAGE_NAME: rosestack/test
-
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -76,6 +74,7 @@ jobs:
         run: |
           mvn spring-boot:build-image -DskipTests
           TAG=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          docker tag ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:$TAG
-          echo "Pushing the image ${{ env.IMAGE_NAME }} to Docker Hub..."
-          docker push --all-tags ${{ env.IMAGE_NAME }}
+          NAME=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+          docker tag $NAME:$TAG $NAME:latest
+          echo "Pushing the image $NAME to ${{ env.REGISTRY }}..."
+          docker push --all-tags $NAME

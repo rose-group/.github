@@ -9,3 +9,5 @@
 
 # Links
 
+- https://www.youtube.com/watch?v=oQwaH_hlBzk
+- https://github.com/kanezi/spring-social-2-cloud/tree/master/.github/workflows

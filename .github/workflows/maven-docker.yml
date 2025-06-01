@@ -20,12 +20,6 @@ on:
         required: false
         type: string
 
-      image-name:
-        description: Name of the image without a tag
-        default: "test"
-        required: false
-        type: string
-
   workflow_dispatch:
     inputs:
       os:
@@ -48,7 +42,7 @@ on:
 
       image-name:
         description: Name of the image without a tag
-        default: "test"
+        default: "rosestack/test"
         required: false
         type: string
 env:
@@ -77,6 +71,11 @@ jobs:
       - name: Set environment variables
         run: |
           echo "TAG=$(echo ${{ github.ref_name }} | sed -e 's/v//')" >> $GITHUB_ENV
+          if [ -n "${{ inputs.image-name }}" ]; then
+            echo "IMAGE_NAME=${{ inputs.image-name }}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_NAME=${{ github.repository }}" >> $GITHUB_ENV
+          fi
 
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v3

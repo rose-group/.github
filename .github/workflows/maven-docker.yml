@@ -1,3 +1,5 @@
+# https://github.com/kanezi/boot-render-deploy/blob/master/.github/workflows/docker-publish.yml
+
 name: Maven Build and Docker
 
 on:
@@ -15,6 +17,8 @@ on:
 
 env:
   MAVEN_ARGS: -B -U -ntp
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -25,9 +29,7 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "TAG=$(echo ${{ github.ref }} | sed -e 's/refs\/tags\///')" >> $GITHUB_ENV
-          echo "REPO_NAME=$(echo ${{ github.repository }} | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE_NAME=${{ github.DOCKER_USERNAME }}/${REPO_NAME}" >> $GITHUB_ENV  
+          echo "TAG=$(echo ${{ github.ref }} | sed -e 's/refs\/tags\/v//')" >> $GITHUB_ENV
 
       - name: Setup Java ${{ matrix.Java }}
         uses: actions/setup-java@v4
@@ -48,6 +50,6 @@ jobs:
       - name: Build and Publish Docker Image
         run: |
           mvn spring-boot:build-image -DskipTests
-          docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME:$TAG
-          echo "Pushing the image $DOCKER_IMAGE_NAME to Docker Hub..."
-          docker push --all-tags $DOCKER_IMAGE_NAME
+          docker tag ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:$TAG
+          echo "Pushing the image ${{ env.IMAGE_NAME }} to Docker Hub..."
+          docker push --all-tags ${{ env.IMAGE_NAME }}

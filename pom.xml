@@ -10,6 +10,6 @@
     </parent>
 
     <groupId>io.github.rosestack</groupId>
-    <artifactId>test</artifactId>
+    <artifactId>github</artifactId>
     <version>0.0.3-SNAPSHOT</version>
 </project>

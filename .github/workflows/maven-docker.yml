@@ -75,6 +75,7 @@ jobs:
           mvn spring-boot:build-image -DskipTests
           TAG=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           NAME=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
-          docker tag $NAME:$TAG $NAME:latest
-          echo "Pushing the image $NAME to ${{ env.REGISTRY }}..."
-          docker push --all-tags $NAME
+          docker tag $NAME:$TAG ${{ env.IMAGE_NAME }}:latest
+          docker tag $NAME:$TAG ${{ env.IMAGE_NAME }}:$TAG
+          echo "Pushing the image ${{ env.IMAGE_NAME }} to ${{ env.REGISTRY }}..."
+          docker push --all-tags ${{ env.IMAGE_NAME }}

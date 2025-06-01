@@ -12,9 +12,7 @@ on:
 concurrency: labels-sync
 
 jobs:
-
   sync:
-
     strategy:
       fail-fast: false
       matrix:
@@ -23,7 +21,6 @@ jobs:
           - rosestack/rose
 
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4

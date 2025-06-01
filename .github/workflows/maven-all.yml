@@ -93,8 +93,8 @@ jobs:
     uses: ./.github/workflows/maven-build.yml
     secrets: inherit
     with:
-      java-default: ${{ inputs.java-default }}
-      java-dist-default: ${{ inputs.java-dist-default }}
+      java-matrix: ${{ inputs.java-matrix }}
+      java-dist-matrix: ${{ inputs.java-dist-matrix }}
       sonar-host: ${{ inputs.sonar-host }}
       sonar-organization: ${{ inputs.sonar-organization }}
 

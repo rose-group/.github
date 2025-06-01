@@ -15,16 +15,6 @@ on:
         required: false
         type: string
 
-      java-default:
-        default: '8'
-        required: false
-        type: string
-
-      java-dist-default:
-        default: 'zulu'
-        required: false
-        type: string
-
       sonar-host:
         default: 'https://sonarcloud.io/'
         required: false
@@ -64,17 +54,6 @@ on:
         default: '["zulu"]'
         required: false
         type: string
-
-      java-default:
-        description: Java Default Version
-        default: '8'
-        required: false
-        type: string
-
-      java-dist-default:
-        description: Java Default Distribution
-        default: 'zulu'
-        required: false
 
       sonar-host:
         description: Sonar Host

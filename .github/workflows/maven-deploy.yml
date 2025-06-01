@@ -5,12 +5,12 @@ name: Maven Deploy
 on:
   workflow_call:
     inputs:
-      java:
+      java-default:
         default: '8'
         required: false
         type: string
 
-      java-dist:
+      java-dist-default:
         default: 'zulu'
         required: false
         type: string
@@ -30,13 +30,13 @@ on:
 
   workflow_dispatch:
     inputs:
-      java:
+      java-default:
         description: Java version to use
         default: '8'
         required: false
         type: string
 
-      java-dist:
+      java-dist-default:
         description: Java distribution to use
         default: 'zulu'
         required: false
@@ -52,11 +52,11 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Set up Java ${{ inputs.java }}
+      - name: Set up Java ${{ inputs.java-default }}
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ inputs.java }}
-          distribution: ${{ inputs.java-dist }}
+          java-version: ${{ inputs.java-default }}
+          distribution: ${{ inputs.java-dist-default }}
           cache: maven
           server-id: central
           server-username: MAVEN_USERNAME

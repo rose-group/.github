@@ -15,16 +15,6 @@ on:
         required: false
         type: string
 
-      java-default:
-        default: '8'
-        required: false
-        type: string
-
-      java-dist-default:
-        default: 'zulu'
-        required: false
-        type: string
-
   workflow_dispatch:
     inputs:
       java-matrix:
@@ -39,17 +29,6 @@ on:
         required: false
         type: string
 
-      java-default:
-        description: Java version to use
-        default: '8'
-        required: false
-        type: string
-
-      java-dist-default:
-        description: Java distribution to use
-        default: 'zulu'
-        required: false
-        type: string
 env:
   MAVEN_ARGS: -B -U -ntp
   # github.repository as <account>/<repo>
@@ -62,8 +41,6 @@ jobs:
     with:
       java-matrix: ${{inputs.java-matrix}}
       java-dist-matrix: ${{inputs.java-dist-matrix}}
-      java-default: ${{ inputs.java-default }}
-      java-dist-default: ${{ inputs.java-dist-default }}
 
   docker:
     runs-on: ubuntu-latest

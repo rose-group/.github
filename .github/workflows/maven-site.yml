@@ -5,25 +5,25 @@ name: Maven Site
 on:
   workflow_call:
     inputs:
-      java:
+      java-matrix:
         default: '8'
         required: false
         type: string
 
-      java-dist:
+      java-dist-matrix:
         default: 'zulu'
         required: false
         type: string
 
   workflow_dispatch:
     inputs:
-      java:
+      java-matrix:
         description: Java Version to use
         default: '8'
         required: false
         type: string
 
-      java-dist:
+      java-dist-matrix:
         description: Java Distribution to use
         default: 'zulu'
         required: false
@@ -39,11 +39,11 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup Java ${{ inputs.java }}
+      - name: Setup Java ${{ inputs.java-matrix }}
         uses: actions/setup-java@v4
         with:
-          distribution: ${{ inputs.java-dist }}
-          java-version: ${{ inputs.java }}
+          distribution: ${{ inputs.java-dist-matrix }}
+          java-version: ${{ inputs.java-matrix }}
           cache: maven
           server-id: github
           server-username: GITHUB_ACTOR

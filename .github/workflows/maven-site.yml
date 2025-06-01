@@ -56,7 +56,7 @@ jobs:
 
       - name: Maven Site
         run: |
-          mvn package site:site site:stage scm-publish:publish-scm
+          mvn package site:site site:stage scm-publish:publish-scm -Dscmpublish.scm.branch=gh-pages
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

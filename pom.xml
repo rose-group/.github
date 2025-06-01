@@ -3,13 +3,104 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.rosestack</groupId>
-        <artifactId>rose-build</artifactId>
-        <version>0.0.3</version>
-        <relativePath/>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.6</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
-
     <groupId>io.github.rosestack</groupId>
-    <artifactId>github</artifactId>
+    <artifactId>.github</artifactId>
     <version>0.0.3-SNAPSHOT</version>
+
+    <description>Github Action</description>
+    <url>https://rosestack.github.io/.github</url>
+    <inceptionYear>2025</inceptionYear>
+
+    <organization>
+        <name>RoseStack</name>
+        <url>https://github.com/rosestack</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>chensoul</name>
+            <email>ichensoul@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:rosestack/.github</connection>
+        <!-- 生成 site 时会使用相对地址，故去掉 .git 后缀-->
+        <developerConnection>scm:git:https://github.com/rosestack/.github</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/rosestack/.github</url>
+    </scm>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/rosestack/.github/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>github</system>
+        <url>https://github.com/rosestack/.github/actions</url>
+    </ciManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>central</id>
+            <name>central-snapshot</name>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <site>
+            <id>github</id>
+            <!--如果使用 ssh，mvn scm-publish:publish-scm 会提示 vpn 无法连接-->
+            <url>${project.scm.developerConnection}</url>
+        </site>
+    </distributionManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

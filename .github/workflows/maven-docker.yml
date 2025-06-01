@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "TAG=$(echo ${{ github.ref }} | sed -e 's/refs\/tags\/v//')" >> $GITHUB_ENV
 
-      - name: Setup Java ${{ matrix.Java }}
+      - name: Setup Java ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           distribution: ${{ matrix.java-dist }}

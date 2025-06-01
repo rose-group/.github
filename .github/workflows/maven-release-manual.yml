@@ -1,4 +1,4 @@
-name: Maven Release by Manual
+name: Maven Release Manual
 
 on:
   workflow_dispatch:

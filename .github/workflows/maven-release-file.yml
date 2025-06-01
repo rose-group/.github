@@ -1,6 +1,6 @@
 # https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/prepare-release.yml
 
-name: Maven Release by File
+name: Maven Release File
 
 on:
   workflow_dispatch:

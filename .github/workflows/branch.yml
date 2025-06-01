@@ -14,6 +14,19 @@ on:
         type: string
         default: "0.0.2-SNAPSHOT"
 
+  workflow_dispatch:
+    inputs:
+      current-version:
+        description: "Release version"
+        required: true
+        type: string
+        default: "0.0.1"
+      next-version:
+        description: "Next version"
+        required: true
+        type: string
+        default: "0.0.2-SNAPSHOT"
+
 permissions:
   contents: write
   issues: write
@@ -63,7 +76,7 @@ jobs:
         run: |
           git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
           git push --tags
-          
+
       - name: Create Branch
         run: |
           git branch -m ${NEXT_BRANCH}

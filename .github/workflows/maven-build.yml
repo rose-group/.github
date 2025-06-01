@@ -41,6 +41,27 @@ on:
       SONAR_TOKEN:
         required: true
 
+  workflow_dispatch:
+    inputs:
+      java-matrix:
+        default: '["8", "11", "17", "21", "24"]'
+        required: false
+        type: string
+
+      java-dist-matrix:
+        default: '["zulu"]'
+        required: false
+        type: string
+
+      java-default:
+        default: '8'
+        required: false
+        type: string
+
+      java-dist-default:
+        default: 'zulu'
+        required: false
+
 env:
   MAVEN_ARGS: -B -U -ntp
 

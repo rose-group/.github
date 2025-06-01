@@ -35,22 +35,6 @@ on:
         required: false
         type: string
 
-    secrets:
-      OSSRH_USERNAME:
-        required: true
-
-      OSSRH_PASSWORD:
-        required: true
-
-      GPG_SECRET_KEY:
-        required: true
-
-      GPG_PASSPHRASE:
-        required: true
-
-      SONAR_TOKEN:
-        required: true
-
   workflow_dispatch:
     inputs:
       java-matrix:

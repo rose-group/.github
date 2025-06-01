@@ -1,4 +1,4 @@
-name: GitHub actions showcase
+name: Showcase
 
 on:
   workflow_dispatch:

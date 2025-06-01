@@ -10,7 +10,7 @@ on:
     inputs:
       image-name:
         description: Name of the image without a tag
-        default: "test"
+        default: "rosestack/test"
         required: false
         type: string
 
@@ -24,9 +24,7 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
-  INPUT_IMAGE_NAME: ${{ inputs.image-name }}
+#  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -41,6 +39,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Set environment variables
+        run: |
+          if [ -n "${{ inputs.image-name }}" ]; then
+            echo "IMAGE_NAME=${{ inputs.image-name }}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_NAME=${{ github.repository }}" >> $GITHUB_ENV
+          fi
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
@@ -70,7 +76,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ env.REGISTRY }}/${{ env.INPUT_IMAGE_NAME || env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
 

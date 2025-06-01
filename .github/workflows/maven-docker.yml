@@ -72,10 +72,8 @@ jobs:
 
       - name: Build and Publish Docker Image
         run: |
-          mvn spring-boot:build-image -DskipTests
+          mvn spring-boot:build-image -DskipTests Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}
           TAG=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          NAME=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
-          docker tag $NAME:$TAG ${{ env.IMAGE_NAME }}:latest
-          docker tag $NAME:$TAG ${{ env.IMAGE_NAME }}:$TAG
+          docker tag ${{ env.IMAGE_NAME }}:$TAG ${{ env.IMAGE_NAME }}:latest
           echo "Pushing the image ${{ env.IMAGE_NAME }} to ${{ env.REGISTRY }}..."
           docker push --all-tags ${{ env.IMAGE_NAME }}

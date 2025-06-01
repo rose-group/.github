@@ -34,6 +34,7 @@ env:
 jobs:
   build:
     uses: ./.github/workflows/maven-build.yml
+    secrets: inherit
     with:
       java-default: ${{ inputs.java-default }}
       java-dist-default: ${{ inputs.java-dist-default }}

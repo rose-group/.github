@@ -7,6 +7,11 @@ name: Docker
 
 on:
   workflow_dispatch:
+    inputs:
+      image-name:
+        required: false
+        type: string
+
   push:
     branches: [ "main", "master" ]
     # Publish semver tags as releases.
@@ -19,7 +24,6 @@ env:
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-
 
 jobs:
   build:
@@ -64,7 +68,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ inputs.image-name || env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
 

@@ -5,6 +5,11 @@ name: Maven All
 on:
   workflow_call:
     inputs:
+      os:
+        default: '["windows-latest", "ubuntu-latest", "macOs-latest"]'
+        required: false
+        type: string
+
       java-matrix:
         default: '["8", "11", "17", "21", "24"]'
         required: false
@@ -37,6 +42,12 @@ on:
 
   workflow_dispatch:
     inputs:
+      os:
+        description: OS
+        default: '["windows-latest", "ubuntu-latest", "macOs-latest"]'
+        required: false
+        type: string
+
       java-matrix:
         description: Java Version
         default: '["8", "11", "17", "21", "24"]'
@@ -77,6 +88,7 @@ jobs:
     uses: ./.github/workflows/maven-build.yml
     secrets: inherit
     with:
+      os: ${{ inputs.os }}
       java-matrix: ${{ inputs.java-matrix }}
       java-dist-matrix: ${{ inputs.java-dist-matrix }}
       sonar-host: ${{ inputs.sonar-host }}

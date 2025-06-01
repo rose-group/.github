@@ -5,6 +5,11 @@ name: Maven Build
 on:
   workflow_call:
     inputs:
+      os:
+        default: '["windows-latest", "ubuntu-latest", "macOs-latest"]'
+        required: false
+        type: string
+
       java-matrix:
         default: '["8", "11", "17", "21", "24"]'
         required: false
@@ -27,6 +32,12 @@ on:
 
   workflow_dispatch:
     inputs:
+      os:
+        description: OS
+        default: '["windows-latest", "ubuntu-latest", "macOs-latest"]'
+        required: false
+        type: string
+
       java-matrix:
         description: Java Version
         default: '["8", "11", "17", "21", "24"]'
@@ -60,24 +71,15 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.os.label }} jdk-${{ matrix.java }}-${{ matrix.java-dist }}
-    runs-on: ${{ matrix.os.name }}
-    continue-on-error: ${{ matrix.os.can-fail }}
+    name: ${{ matrix.os }}-jdk-${{ matrix.java }}-${{ matrix.java-dist }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: false
     if: "!contains(github.event.head_commit.message, '[CI Skip]') && !contains(github.event.pull_request.title, '[CI Skip]')"
 
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - name: ubuntu-latest
-            label: Linux
-            can-fail: false
-          - name: windows-latest
-            label: Windows
-            can-fail: false
-          - name: macOS-latest
-            label: macOS
-            can-fail: true
+        os: ${{ fromJSON( inputs.os ) }}
         java: ${{ fromJSON( inputs.java-matrix ) }}
         java-dist: ${{ fromJSON( inputs.java-dist-matrix ) }}
 
@@ -96,7 +98,7 @@ jobs:
         id: sonar
         run: echo "mvn-args=sonar:sonar -Dsonar.host.url=${{inputs.sonar-host}} -Dsonar.organization=${{inputs.sonar-organization}} -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
         if: >
-          matrix.os.name == 'ubuntu-latest'
+          matrix.os == 'ubuntu-latest'
           && matrix.java == '17'
           && startsWith( github.ref, 'refs/heads/')
 
@@ -106,7 +108,7 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         if: >
-          matrix.os.name == 'ubuntu-latest'
+          matrix.os == 'ubuntu-latest'
           && matrix.java == '17'
           && startsWith( github.ref, 'refs/heads/')
         with:

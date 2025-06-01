@@ -5,6 +5,11 @@ name: Maven Docker
 on:
   workflow_call:
     inputs:
+      os:
+        default: '["ubuntu-latest"]'
+        required: false
+        type: string
+
       java-matrix:
         default: '["8"]'
         required: false
@@ -17,6 +22,11 @@ on:
 
   workflow_dispatch:
     inputs:
+      os:
+        default: '["ubuntu-latest"]'
+        required: false
+        type: string
+
       java-matrix:
         description: Java Version
         default: '["8"]'
@@ -39,6 +49,7 @@ jobs:
     uses: ./.github/workflows/maven-build.yml
     secrets: inherit
     with:
+      os: ${{inputs.os}}
       java-matrix: ${{inputs.java-matrix}}
       java-dist-matrix: ${{inputs.java-dist-matrix}}
 

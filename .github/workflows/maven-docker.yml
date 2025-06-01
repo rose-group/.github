@@ -22,6 +22,7 @@ on:
 
       image-name:
         description: Name of the image without a tag
+        default: "test"
         required: false
         type: string
 
@@ -47,6 +48,7 @@ on:
 
       image-name:
         description: Name of the image without a tag
+        default: "test"
         required: false
         type: string
 env:

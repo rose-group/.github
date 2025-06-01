@@ -10,6 +10,7 @@ on:
     inputs:
       image-name:
         description: Name of the image without a tag
+        default: "test"
         required: false
         type: string
 

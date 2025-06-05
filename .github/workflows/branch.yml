@@ -67,10 +67,7 @@ jobs:
         run: |
           mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
-          if git status --porcelain | grep -q .; then
-            git commit --no-verify -a -m "Releasing ${CURRENT_VERSION}"
-            git push origin $(git rev-parse --abbrev-ref HEAD)
-          fi
+          git diff --exit-code || git commit -am "Releasing ${CURRENT_VERSION}" && git push
 
       - name: Create Tag
         run: |
@@ -81,8 +78,7 @@ jobs:
         run: |
           git branch -m ${NEXT_BRANCH}
           mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
-          git commit --no-verify -a -m "Next version v${NEXT_VERSION}"
-          git push origin $(git rev-parse --abbrev-ref HEAD)
+          git diff --exit-code || git commit -am "Next version v${NEXT_VERSION}" && git push
 
       - name: Release Milestone
         uses: rosestack/milestone-release-action@main

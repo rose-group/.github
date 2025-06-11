@@ -5,38 +5,27 @@ name: Maven Docker
 on:
   workflow_call:
     inputs:
-      os:
-        default: '["ubuntu-latest"]'
+      java:
+        default: '8'
         required: false
         type: string
 
-      java-matrix:
-        default: '["8"]'
-        required: false
-        type: string
-
-      java-dist-matrix:
-        default: '["zulu"]'
+      java-dist:
+        default: 'zulu'
         required: false
         type: string
 
   workflow_dispatch:
     inputs:
-      os:
-        default: '["ubuntu-latest"]'
-        description: OS
+      java:
+        description: Java version to use
+        default: '8'
         required: false
         type: string
 
-      java-matrix:
-        description: Java Version
-        default: '["8"]'
-        required: false
-        type: string
-
-      java-dist-matrix:
-        description: Java Distribution
-        default: '["zulu"]'
+      java-dist:
+        description: Java distribution to use
+        default: 'zulu'
         required: false
         type: string
 
@@ -45,24 +34,23 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
-#  IMAGE_NAME: ${{ github.repository }}
+  #  IMAGE_NAME: ${{ github.repository }}
   IMAGE_NAME: rosestack/test
 
 jobs:
-  build:
-    uses: ./.github/workflows/maven-build.yml
-    secrets: inherit
-    with:
-      os: ${{inputs.os}}
-      java-matrix: ${{inputs.java-matrix}}
-      java-dist-matrix: ${{inputs.java-dist-matrix}}
-
   docker:
     runs-on: ubuntu-latest
-    needs: build
-    # if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ inputs.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java }}
+          distribution: ${{ inputs.java-dist }}
+          cache: maven
 
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v3

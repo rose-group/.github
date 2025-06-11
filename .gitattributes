@@ -1,0 +1,46 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Java sources
+*.java text diff=java
+
+# XML files
+*.xml text diff=xml
+
+# YAML files
+*.yml text diff=yaml
+*.yaml text diff=yaml
+
+# Markdown files
+*.md text diff=markdown
+
+# Properties files
+*.properties text
+
+# Documentation
+*.txt text
+*.adoc text diff=asciidoc
+
+# Graphics
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.svg text
+
+# Build files
+*.jar binary
+*.war binary
+*.ear binary
+*.class binary
+
+# IDE files
+.idea/* text
+*.iml text
+.vscode/* text
+*.sublime-* text
+
+# Maven
+pom.xml text diff=xml
+mvnw text eol=lf
+mvnw.cmd text eol=crlf 

@@ -94,16 +94,8 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: maven
 
-      - name: Sonar Setup
-        id: sonar
-        run: echo "mvn-args=sonar:sonar -Dsonar.host.url=${{inputs.sonar-host}} -Dsonar.organization=${{inputs.sonar-organization}} -Dsonar.token=${{secrets.SONAR_TOKEN}}" >> $GITHUB_OUTPUT
-        if: >
-          matrix.os == 'ubuntu-latest'
-          && matrix.java == '17'
-          && startsWith( github.ref, 'refs/heads/')
-
       - name: Build with Maven
-        run: mvn verify ${{ steps.sonar.outputs.mvn-args }}
+        run: mvn verify
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

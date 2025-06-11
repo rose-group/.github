@@ -20,16 +20,6 @@ on:
         required: false
         type: string
 
-      sonar-host:
-        default: 'https://sonarcloud.io/'
-        required: false
-        type: string
-
-      sonar-organization:
-        default: 'rosestack'
-        required: false
-        type: string
-
   workflow_dispatch:
     inputs:
       os:
@@ -47,18 +37,6 @@ on:
       java-dist-matrix:
         description: Java Distribution
         default: '["zulu"]'
-        required: false
-        type: string
-
-      sonar-host:
-        description: Sonar Host
-        default: 'https://sonarcloud.io/'
-        required: false
-        type: string
-
-      sonar-organization:
-        description: Sonar Organization
-        default: 'rosestack'
         required: false
         type: string
 

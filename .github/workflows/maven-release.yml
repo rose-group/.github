@@ -1,6 +1,6 @@
 # https://github.com/s4u/.github/blob/master/.github/workflows/maven-build.yml
 
-name: Maven Deploy
+name: Maven Release
 
 on:
   workflow_call:
@@ -59,6 +59,7 @@ jobs:
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             target/*.jar

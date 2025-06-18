@@ -115,16 +115,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download Site
+        uses: actions/download-artifact@v4
+        with:
+          name: archive-release
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            target/*.jar
-            target/*.pom
-            target/*.asc
-            target/*.md5
-            target/*.sha1
-            target/*.sha256
+            **/target/*.asc
+            **/target/*.jar
+            **/target/*.pom
             target/*.buildinfo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

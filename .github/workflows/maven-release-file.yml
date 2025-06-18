@@ -1,11 +1,11 @@
 # https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/prepare-release.yml
 
-name: Maven Release File
+name: Maven Build and Deploy Release By File
 
 ##
 ## Automates the release process
 ## 1. Edit the file .github/project.yml, update version.
-## 2. Commit 
+## 2. Commit
 ## 3. Create PR, merge PR
 ##
 

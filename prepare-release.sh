@@ -8,8 +8,8 @@ RELEASE=${SNAPSHOT/-SNAPSHOT/}
 
 git checkout -b "release-$RELEASE"
 
-mvn release:prepare -ntp -B
-mvn release:clean -ntp -B
+mvn -ntp -B release:prepare
+mvn -ntp -B release:clean
 
 git push origin "release-$RELEASE"
 

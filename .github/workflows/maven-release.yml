@@ -1,6 +1,6 @@
 # https://github.com/s4u/.github/blob/master/.github/workflows/maven-build.yml
 
-name: Maven Release
+name: Maven Build and Deploy Release
 
 ##
 ## Automates the release process

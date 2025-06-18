@@ -1,4 +1,4 @@
-name: Create Next Branch
+name: Maven Create Next Branch
 
 on:
   workflow_call:
@@ -65,20 +65,27 @@ jobs:
 
       - name: Set Release version
         run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+          git checkout -b "release-$CURRENT_VERSION"
+
+          # create new tag for release
           mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
-          git diff --exit-code || git commit -am "Releasing ${CURRENT_VERSION}" && git push
 
-      - name: Create Tag
-        run: |
-          git tag -a "v${CURRENT_VERSION}" -m "Release v${CURRENT_VERSION}"
+          git tag -a "v${CURRENT_VERSION}" -m "[CI Skip] Release v${CURRENT_VERSION}"
+
+          # update version to
+          mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${NEXT_VERSION}</version>|g" README.md
+          git diff --exit-code || git commit -am "[CI Skip] prepare for next development iteration"
+          git push origin "release-$CURRENT_VERSION"
+
+          git checkout $BRANCH
+
+          git branch -D "release-$CURRENT_VERSION"
+
           git push --tags
-
-      - name: Create Branch
-        run: |
-          git branch -m ${NEXT_BRANCH}
-          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
-          git diff --exit-code || git commit -am "Next version v${NEXT_VERSION}" && git push
 
       - name: Release Milestone
         uses: rosestack/milestone-release-action@main

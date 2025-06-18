@@ -1,6 +1,6 @@
 # https://github.com/kanezi/boot-render-deploy/blob/master/.github/workflows/docker-publish.yml
 
-name: Maven Docker
+name: Docker Publish by SpringBoot
 
 on:
   workflow_call:
@@ -33,9 +33,6 @@ env:
   MAVEN_ARGS: -B -U -ntp
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
-  # github.repository as <account>/<repo>
-  #  IMAGE_NAME: ${{ github.repository }}
-  IMAGE_NAME: rosestack/test
 
 jobs:
   docker:
@@ -61,8 +58,13 @@ jobs:
 
       - name: Build and Publish Docker Image
         run: |
-          mvn spring-boot:build-image -DskipTests -Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}
-          TAG=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          docker tag ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}:$TAG
-          echo "Pushing the image ${{ env.IMAGE_NAME }} to ${{ env.REGISTRY }}..."
-          docker push --all-tags ${{ env.IMAGE_NAME }}
+          mvn spring-boot:build-image -DskipTests
+
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          PROJECT_NAME=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/$PROJECT_NAME
+          echo $IMAGE_NAME
+
+          docker tag $PROJECT_NAME:$VERSION $IMAGE_NAME:latest
+          echo "Pushing the image $IMAGE_NAME to ${{ env.REGISTRY }}..."
+          docker push --all-tags $IMAGE_NAME

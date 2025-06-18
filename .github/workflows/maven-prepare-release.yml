@@ -1,0 +1,86 @@
+name: Maven Prepare Release
+
+## 1. Create release branch in local
+## 2. mvn release:prepare release:clean
+## 3. Delete release branch
+## 4. push tag -> trigger release workflow
+
+on:
+  workflow_call:
+    inputs:
+      current-version:
+        description: "Release version"
+        required: true
+        type: string
+        default: "0.0.1"
+      next-version:
+        description: "Next version"
+        required: true
+        type: string
+        default: "0.0.2-SNAPSHOT"
+
+
+  workflow_dispatch:
+    inputs:
+      current-version:
+        description: "Release version"
+        required: true
+        type: string
+        default: "0.0.1"
+      next-version:
+        description: "Next version"
+        required: true
+        type: string
+        default: "0.0.2-SNAPSHOT"
+
+env:
+  MAVEN_ARGS: -B -U -ntp
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "CURRENT_VERSION=${DISPATCH_CURRENT_VERSION}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION}" >> $GITHUB_ENV
+        env:
+          DISPATCH_CURRENT_VERSION: ${{ inputs.current-version }}
+          DISPATCH_NEXT_VERSION: ${{ inputs.next-version }}
+
+      - name: Validate version
+        if: contains(env.CURRENT_VERSION, 'SNAPSHOT')
+        run: |
+          echo '::error::Cannot release a SNAPSHOT version.'
+          exit 1
+
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+
+      - name: Get version
+        run: |
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "VERSION=$VERSION"
+
+      - name: Build Prepare Release with Maven
+        timeout-minutes: 120
+        run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+          git checkout -b "release-$CURRENT_VERSION"
+
+          mvn release:prepare -DreleaseVersion=$CURRENT_VERSION -DdevelopmentVersion=$NEXT_VERSION
+          mvn release:clean
+
+          git push origin "release-$CURRENT_VERSION"
+
+          git checkout $BRANCH
+
+          git branch -D "release-$CURRENT_VERSION"
+
+          git push --tags

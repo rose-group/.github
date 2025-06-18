@@ -72,8 +72,8 @@ jobs:
           name: code-coverage-report
           retention-days: 7
           path: |
-            **/target/jacoco-results/jacoco.xml
-            **/target/jacoco-results/**/*.html
+            target/jacoco-results/jacoco.xml
+            target/jacoco-results/**/*.html
 
       - name: Archive Release
         id: archive-release
@@ -82,9 +82,9 @@ jobs:
           name: archive-release
           retention-days: 7
           path: |
-            **/target/*.asc
-            **/target/*.jar
-            **/target/*.pom
+            target/*.asc
+            target/*.jar
+            target/*.pom
             target/*.buildinfo
 
       - name: Archive Site
@@ -117,7 +117,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Download Site
+      - name: Download Release
         uses: actions/download-artifact@v4
         with:
           name: archive-release
@@ -127,9 +127,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            **/target/*.asc
-            **/target/*.jar
-            **/target/*.pom
+            target/*.asc
+            target/*.jar
+            target/*.pom
             target/*.buildinfo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

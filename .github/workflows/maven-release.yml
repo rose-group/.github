@@ -16,12 +16,14 @@ on:
       - "v*"
   workflow_call:
     inputs:
-      java-default:
+      java:
+        description: Java version to use
         default: '8'
         required: false
         type: string
 
       java-dist:
+        description: Java distribution to use
         default: 'zulu'
         required: false
         type: string
@@ -50,11 +52,11 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Set up Java ${{ inputs.java || '8' }}
+      - name: Set up Java 8
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ inputs.java || '8' }}
-          distribution: ${{ inputs.java-dist || 'zulu' }}
+          java-version: 8
+          distribution: 'zulu'
           cache: maven
           server-id: central
           server-username: MAVEN_USERNAME

@@ -37,8 +37,7 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:rosestack/.github</connection>
-        <!-- 生成 site 时会使用相对地址，故去掉 .git 后缀-->
+        <connection>scm:git:https://github.com/rosestack/.github</connection>
         <developerConnection>scm:git:https://github.com/rosestack/.github</developerConnection>
         <tag>HEAD</tag>
         <url>https://github.com/rosestack/.github</url>
@@ -62,8 +61,7 @@
         </snapshotRepository>
         <site>
             <id>github</id>
-            <!--如果使用 ssh，mvn scm-publish:publish-scm 会提示 vpn 无法连接-->
-            <url>${project.scm.developerConnection}</url>
+            <url>https://rosestack.github.io/.github</url>
         </site>
     </distributionManagement>
 

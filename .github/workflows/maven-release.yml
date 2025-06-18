@@ -33,7 +33,7 @@ env:
   MAVEN_ARGS: -B -U -ntp
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
@@ -51,12 +51,76 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # macOS: gpg --armor --export-secret-key
 
-      - run: mvn -DskipTests -Prelease deploy
+      - name: Get version
+        run: |
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "VERSION=$VERSION"
+
+      - name: Build Release with Maven
+        timeout-minutes: 120
+        run: |
+          mvn -ntp -B -DskipTests -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
+      - name: Archive code coverage results
+        id: archive-coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          retention-days: 7
+          path: |
+            **/target/jacoco-results/jacoco.xml
+            **/target/jacoco-results/**/*.html
+
+      - name: Archive Release
+        id: archive-release
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive-release
+          retention-days: 7
+          path: |
+            **/target/*.asc
+            **/target/*.jar
+            **/target/*.pom
+            target/*.buildinfo
+
+      - name: Archive Site
+        id: archive-site
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive-site
+          retention-days: 7
+          path: target/staging/
+
+
+  #  publish_coverage:
+  #    name: publish code coverage reports
+  #    runs-on: ubuntu-latest
+  #    needs: build
+  #    steps:
+  #      - name: Download coverage reports
+  #        uses: actions/download-artifact@v4
+  #        with:
+  #          name: code-coverage-report
+  #      - name: Run codacy-coverage-reporter
+  #        uses: codacy/codacy-coverage-reporter-action@master
+  #        with:
+  #          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+  #          coverage-reports: target/jacoco-results/jacoco.xml
+  #
+  #  docker:
+  #    name: Publish Docker
+  #    runs-on: ubuntu-latest
+  #    needs: build
+
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -68,5 +132,40 @@ jobs:
             target/*.md5
             target/*.sha1
             target/*.sha256
+            target/*.buildinfo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload buildinfo
+        id: upload-release-buildinfo
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/rose-build-${{env.VERSION}}.buildinfo
+          asset_name: rose-build-${{env.VERSION}}.buildinfo
+          asset_content_type: text/plain
+
+  publish:
+    name: Publish gh-pages
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download Site
+        uses: actions/download-artifact@v4
+        with:
+          name: archive-site
+          path: target/staging
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: target
+      - name: Deploy gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4.6.3
+        with:
+          branch: gh-pages
+          folder: target/staging
+          clean: false
+

@@ -1,5 +1,10 @@
 name: Maven Release Manual
 
+##
+## Automates the release process
+## 1. Run this workflow, input Release version and Next version.
+##
+
 on:
   workflow_dispatch:
     inputs:

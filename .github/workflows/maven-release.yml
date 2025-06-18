@@ -14,33 +14,33 @@ on:
   push:
     tags:
       - "v*"
-#  workflow_call:
-#    inputs:
-#      java:
-#        description: Java version to use
-#        default: '8'
-#        required: false
-#        type: string
-#
-#      java-dist:
-#        description: Java distribution to use
-#        default: 'zulu'
-#        required: false
-#        type: string
-#
-#  workflow_dispatch:
-#    inputs:
-#      java:
-#        description: Java version to use
-#        default: '8'
-#        required: false
-#        type: string
-#
-#      java-dist:
-#        description: Java distribution to use
-#        default: 'zulu'
-#        required: false
-#        type: string
+  workflow_call:
+    inputs:
+      java:
+        description: Java version to use
+        default: '8'
+        required: false
+        type: string
+
+      java-dist:
+        description: Java distribution to use
+        default: 'zulu'
+        required: false
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      java:
+        description: Java version to use
+        default: '8'
+        required: false
+        type: string
+
+      java-dist:
+        description: Java distribution to use
+        default: 'zulu'
+        required: false
+        type: string
 
 env:
   MAVEN_ARGS: -B -U -ntp
@@ -118,6 +118,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: code-coverage-report
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:

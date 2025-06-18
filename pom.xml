@@ -9,7 +9,7 @@
   </parent>
   <groupId>io.github.rosestack</groupId>
   <artifactId>test</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.3</version>
 
   <description>Github Action Templates</description>
   <url>https://rosestack.github.io/.github</url>

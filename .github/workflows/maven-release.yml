@@ -2,6 +2,14 @@
 
 name: Maven Release
 
+##
+## Automates the release process
+## 1. Run `./list-changes.sh` and update the changelog.md.
+## 2. Run `./prepare-release.sh`
+## 3. Create PR, merge PR
+## 4. Run `git push origin --tags`
+##
+
 on:
   push:
     tags:

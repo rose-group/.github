@@ -59,7 +59,7 @@ jobs:
       - name: Build Release with Maven
         timeout-minutes: 120
         run: |
-          mvn -ntp -B -DskipTests -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
+          mvn -V -ntp -B -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}

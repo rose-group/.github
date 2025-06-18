@@ -78,15 +78,15 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-#      - name: Archive code coverage results
-#        id: archive-coverage
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: code-coverage-report
-#          retention-days: 7
-#          path: |
-#            target/jacoco-results/jacoco.xml
-#            target/jacoco-results/**/*.html
+      - name: Archive code coverage results
+        id: archive-coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          retention-days: 7
+          path: |
+            target/jacoco-results/jacoco.xml
+            target/jacoco-results/**/*.html
 
       - name: Archive Release
         id: archive-release
@@ -109,19 +109,19 @@ jobs:
           path: target/staging/
 
 
-#  publish_coverage:
-#    name: publish code coverage reports
-#    runs-on: ubuntu-latest
-#    needs: build
-#    steps:
-#      - name: Download coverage reports
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: code-coverage-report
-#      - name: Upload coverage reports to Codecov
-#        uses: codecov/codecov-action@v5
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
+  publish_coverage:
+    name: publish code coverage reports
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: code-coverage-report
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   release:
     name: Publish Release

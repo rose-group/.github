@@ -140,10 +140,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            target/*.asc
-            target/*.jar
-            target/*.pom
-            target/*.buildinfo
+            *.asc
+            *.jar
+            *.pom
+            *.buildinfo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

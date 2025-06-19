@@ -1,4 +1,4 @@
 name: project config
 release:
-  current-version: 0.0.13
+  release-version: 0.0.13
   next-version: 0.0.14-SNAPSHOT

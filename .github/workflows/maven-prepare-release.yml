@@ -58,11 +58,6 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Configure Git User
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
-
       - name: Get version
         run: |
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
@@ -71,6 +66,11 @@ jobs:
             echo "::error::You don't have a SNAPSHOT project in the projects list."
             exit 1
           fi
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
 
       - name: Build Prepare Release with Maven
         timeout-minutes: 120

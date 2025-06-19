@@ -1,4 +1,13 @@
-name: Maven Create Next Branch
+name: Maven Version Release
+
+## Step:
+## 1. Create release branch in local
+## 2. mvn versions:set for release
+## 3. create new tag for release
+## 4. update version to snapshot
+## 5. Delete release branch
+## 6. push tag -> trigger release workflow
+
 
 on:
   workflow_call:
@@ -70,13 +79,13 @@ jobs:
           git checkout -b "release-$CURRENT_VERSION"
 
           # create new tag for release
-          mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
 
           git tag -a "v${CURRENT_VERSION}" -m "[CI Skip] Release v${CURRENT_VERSION}"
 
-          # update version to
-          mvn -B versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          # update version to snapshot
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${NEXT_VERSION}</version>|g" README.md
           git diff --exit-code || git commit -am "[CI Skip] prepare for next development iteration"
           git push origin "release-$CURRENT_VERSION"

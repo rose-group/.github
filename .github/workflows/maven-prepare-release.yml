@@ -1,5 +1,6 @@
 name: Maven Prepare Release
 
+## Step:
 ## 1. Create release branch in local
 ## 2. mvn release:prepare release:clean
 ## 3. Delete release branch

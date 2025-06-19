@@ -118,18 +118,23 @@ jobs:
           git checkout $GITHUB_REF_NAME
           git branch -D "release-$RELEASE_VERSION"
 
-      - name: Set Next Version
-        run: |
-          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
-          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ inputs.github-token }}
+          publish_dir: ./target/staging
 
-          git checkout $GITHUB_REF_NAME
-          git branch -D "release-$RELEASE_VERSION"
-
-      - name: Create Github Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.3.2
         with:
           tag_name: v$RELEASE_VERSION
+          files: |
+            target/*.asc
+            target/*.jar
+            target/*.pom
+            target/*.buildinfoAdd commentMore actions
+        env:
+          GITHUB_TOKEN: ${{ inputs.github-token }}
 
       - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main

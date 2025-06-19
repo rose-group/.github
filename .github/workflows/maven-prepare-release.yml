@@ -80,7 +80,7 @@ jobs:
 
           git checkout -b "release-$RELEASE_VERSION"
 
-          mvn release:prepare -DinteractiveMode=false -DreleaseVersion=$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
+          mvn release:prepare -DinteractiveMode=false -DreleaseVersion=$RELEASE_VERSION -Dtag=v$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
           mvn release:clean
 
           git push origin "release-$RELEASE_VERSION"

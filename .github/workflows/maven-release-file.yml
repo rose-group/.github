@@ -20,7 +20,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: rosestack/maven-release-by-file-action@v1
+      - uses: rosestack/maven-release-by-file-action@v1.1
         with:
           gpg-secret-key: ${{secrets.GPG_PRIVATE_KEY}}
           gpg-passphrase: ${{secrets.GPG_PASSPHRASE}}

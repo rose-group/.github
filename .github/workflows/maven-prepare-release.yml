@@ -100,9 +100,23 @@ jobs:
         run: |
           mvn -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
         env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          MAVEN_USERNAME: ${{ inputs.ossrh-username }}
+          MAVEN_PASSWORD: ${{ inputs.ossrh-password }}
+          MAVEN_GPG_PASSPHRASE: ${{ inputs.gpg-passphrase }}
+
+      - name: Create Tag
+        shell: bash
+        run: |
+          git tag -a "v${RELEASE_VERSION}" -m "Release tag v${RELEASE_VERSION}"
+          git push --tags
+
+      - name: Set Next Version
+        run: |
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
+
+          git checkout $GITHUB_REF_NAME
+          git branch -D "release-$RELEASE_VERSION"
 
       - name: Create Tag
         shell: bash

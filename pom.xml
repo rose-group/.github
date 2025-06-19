@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>2.7.18</version>
-    <relativePath /> <!-- lookup parent from repository -->
+    <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>io.github.rosestack</groupId>
   <artifactId>test</artifactId>
-  <version>0.0.7-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
 
+  <name>test</name>
   <description>Github Action Templates</description>
   <url>https://rosestack.github.io/.github</url>
   <inceptionYear>2025</inceptionYear>
@@ -38,7 +40,7 @@
   <scm>
     <connection>scm:git:https://github.com/rosestack/.github</connection>
     <developerConnection>scm:git:https://github.com/rosestack/.github</developerConnection>
-    <tag>v0.0.3</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/rosestack/.github</url>
   </scm>
 
@@ -79,7 +81,8 @@
     <sonar.organization>rosestack</sonar.organization>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/jacoco-results/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/jacoco-results/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
     <sonar.language>java</sonar.language>
   </properties>
 
@@ -117,24 +120,24 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-artifact-plugin</artifactId>
-        <version>3.5.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>buildinfo</goal>
-            </goals>
-            <phase>verify</phase>
-            <configuration>
-              <!--suppress UnresolvedMavenProperty -->
-              <outputTimestamp>${git.commit.time}</outputTimestamp>
-              <reproducible>true</reproducible>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+      <!--      <plugin>-->
+      <!--        <groupId>org.apache.maven.plugins</groupId>-->
+      <!--        <artifactId>maven-artifact-plugin</artifactId>-->
+      <!--        <version>3.5.1</version>-->
+      <!--        <executions>-->
+      <!--          <execution>-->
+      <!--            <goals>-->
+      <!--              <goal>buildinfo</goal>-->
+      <!--            </goals>-->
+      <!--            <phase>verify</phase>-->
+      <!--            <configuration>-->
+      <!--              &lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
+      <!--              <outputTimestamp>${git.commit.time}</outputTimestamp>-->
+      <!--              <reproducible>true</reproducible>-->
+      <!--            </configuration>-->
+      <!--          </execution>-->
+      <!--        </executions>-->
+      <!--      </plugin>-->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -143,13 +146,10 @@
         <configuration>
           <preparationGoals>clean verify</preparationGoals>
           <preparationProfiles>!tests</preparationProfiles>
-          <releaseProfiles>release</releaseProfiles>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <arguments>-Dmaven.javadoc.skip=true -DskipTests -DskipITs</arguments>
           <tagNameFormat>v@{project.version}</tagNameFormat>
           <scmCommentPrefix>[CI Skip]</scmCommentPrefix>
-          <updateWorkingCopyVersions>true</updateWorkingCopyVersions>
-          <pushChanges>false</pushChanges>
         </configuration>
       </plugin>
 
@@ -242,7 +242,7 @@
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.7.0</version>
+            <version>0.8.0</version>
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>

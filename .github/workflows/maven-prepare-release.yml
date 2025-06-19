@@ -125,14 +125,8 @@ jobs:
           publish_dir: ./target/staging
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2.3.2
-        with:
-          tag_name: v$RELEASE_VERSION
-          files: |
-            target/*.asc
-            target/*.jar
-            target/*.pom
-            target/*.buildinfoAdd commentMore actions
+        run: |
+          gh release create v${RELEASE_VERSION} --generate-notes target/*.asc target/*.jar target/*.pom target/*.buildinfo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

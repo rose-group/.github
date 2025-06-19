@@ -11,7 +11,6 @@ name: Maven Release By File
 ##
 
 on:
-  workflow_dispatch:
   pull_request:
     types: [ closed ]
     paths:

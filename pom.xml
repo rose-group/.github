@@ -9,7 +9,7 @@
   </parent>
   <groupId>io.github.rosestack</groupId>
   <artifactId>test</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.3</version>
 
   <description>Github Action Templates</description>
   <url>https://rosestack.github.io/.github</url>
@@ -38,7 +38,7 @@
   <scm>
     <connection>scm:git:https://github.com/rosestack/.github</connection>
     <developerConnection>scm:git:https://github.com/rosestack/.github</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.0.3</tag>
     <url>https://github.com/rosestack/.github</url>
   </scm>
 
@@ -73,7 +73,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!--reproducible build-->
-    <project.build.outputTimestamp>2025-06-18T15:47:05Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-06-19T01:20:43Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>

@@ -84,9 +84,6 @@ jobs:
 
       - name: Set Release version
         run: |
-          BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          echo $BRANCH
-
           git checkout -b "release-$RELEASE_VERSION"
 
           mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}

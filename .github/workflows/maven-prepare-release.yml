@@ -20,7 +20,6 @@ on:
         type: string
         default: "0.0.2-SNAPSHOT"
 
-
   workflow_dispatch:
     inputs:
       release-version:
@@ -35,7 +34,7 @@ on:
         default: "0.0.2-SNAPSHOT"
 
 env:
-  MAVEN_ARGS: -B -U -ntp
+  MAVEN_ARGS: -V -ntp -U -B
 
 jobs:
   build:
@@ -57,6 +56,18 @@ jobs:
 
       - name: Checkout Source
         uses: actions/checkout@v4
+
+      - name: Set up Java 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: 8
+          distribution: 'zulu'
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # macOS: gpg --armor --export-secret-key
 
       - name: Get version
         run: |
@@ -80,16 +91,21 @@ jobs:
 
           git checkout -b "release-$RELEASE_VERSION"
 
-          mvn release:prepare -DinteractiveMode=false -DreleaseVersion=$RELEASE_VERSION -Dtag=v$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
-          mvn release:clean
+          mvn release:prepare -DinteractiveMode=false -DnoBackup=true -DreleaseVersion=$RELEASE_VERSION -Dtag=v$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
 
           git push origin "release-$RELEASE_VERSION"
+
+          mvn -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
 
           git checkout $BRANCH
 
           git branch -D "release-$RELEASE_VERSION"
 
           git push --tags
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main

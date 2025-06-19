@@ -43,7 +43,7 @@ on:
         type: string
 
 env:
-  MAVEN_ARGS: -B -U -ntp
+  MAVEN_ARGS: -V -ntp -U -B
 
 jobs:
   build:

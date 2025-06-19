@@ -30,7 +30,7 @@ on:
         type: string
 
 env:
-  MAVEN_ARGS: -B -U -ntp
+  MAVEN_ARGS: -V -ntp -U -B
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
 

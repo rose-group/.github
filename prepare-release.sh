@@ -8,9 +8,8 @@ RELEASE=${SNAPSHOT/-SNAPSHOT/}
 
 git checkout -b "release-$RELEASE"
 
-#  mvn release:prepare -DinteractiveMode=false -DreleaseVersion=$RELEASE_VERSION -Dtag=v$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
-mvn -ntp -B release:prepare
-mvn -ntp -B release:clean
+#  mvn release:prepare -DinteractiveMode=false -DnoBackup=true -DreleaseVersion=$RELEASE_VERSION -Dtag=v$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
+mvn -ntp -B release:prepare -DnoBackup=true
 
 git push origin "release-$RELEASE"
 

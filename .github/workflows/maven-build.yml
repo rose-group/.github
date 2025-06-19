@@ -41,7 +41,7 @@ on:
         type: string
 
 env:
-  MAVEN_ARGS: -B -U -ntp
+  MAVEN_ARGS: -V -ntp -U -B
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

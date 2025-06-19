@@ -21,7 +21,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: rosestack/maven-release-by-manual-action@main
+      - uses: rosestack/maven-release-by-manual-action@v1
         with:
           release-version: ${{github.event.inputs.release-version}}
           next-version: ${{github.event.inputs.next-version}}

@@ -1,6 +1,6 @@
 # https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/prepare-release.yml
 
-name: Maven Build and Deploy Release By File
+name: Maven Release By File
 
 ##
 ## Automates the release process

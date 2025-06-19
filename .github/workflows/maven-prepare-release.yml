@@ -67,6 +67,10 @@ jobs:
         run: |
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
           echo "VERSION=$VERSION"
+          if [[ $VERSION == *-SNAPSHOT ]]; then
+            echo '::error::Cannot release a SNAPSHOT version.'
+            exit 1
+          fi
 
       - name: Build Prepare Release with Maven
         timeout-minutes: 120

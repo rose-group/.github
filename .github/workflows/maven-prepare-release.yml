@@ -118,6 +118,20 @@ jobs:
           git checkout $GITHUB_REF_NAME
           git branch -D "release-$RELEASE_VERSION"
 
+      - name: Create Tag
+        shell: bash
+        run: |
+          git tag -a "v${RELEASE_VERSION}" -m "Release tag v${RELEASE_VERSION}"
+          git push --tags
+
+      - name: Set Next Version
+        run: |
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
+
+          git checkout $GITHUB_REF_NAME
+          git branch -D "release-$RELEASE_VERSION"
+
       - name: Create Github Release
         uses: softprops/action-gh-release@v2.3.2
         with:

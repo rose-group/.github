@@ -1,4 +1,5 @@
 # https://github.com/s4u/.github/blob/master/.github/workflows/maven-build.yml
+# https://github.com/jeremylong/DependencyCheck/blob/main/.github/workflows/release.yml
 
 name: Maven Release
 

@@ -9,7 +9,7 @@
   </parent>
   <groupId>io.github.rosestack</groupId>
   <artifactId>test</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.5-SNAPSHOT</version>
 
   <description>Github Action Templates</description>
   <url>https://rosestack.github.io/.github</url>
@@ -73,7 +73,14 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!--reproducible build-->
-    <project.build.outputTimestamp>2025-06-19T01:20:58Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-06-19T01:31:39Z</project.build.outputTimestamp>
+
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.organization>rosestack</sonar.organization>
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/jacoco-results/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.language>java</sonar.language>
   </properties>
 
   <dependencies>

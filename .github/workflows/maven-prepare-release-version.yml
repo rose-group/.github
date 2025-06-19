@@ -72,9 +72,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Set Release version
+      - name: Build Prepare Release with Maven
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo $BRANCH
 
           git checkout -b "release-$RELEASE_VERSION"
 

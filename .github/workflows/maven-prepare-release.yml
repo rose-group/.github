@@ -1,10 +1,9 @@
 name: Maven Prepare Release
 
-## Step:
-## 1. Create release branch in local
-## 2. mvn release:prepare release:clean
-## 3. Delete release branch
-## 4. push tag -> trigger maven-release.yml
+##
+## Automates the release process
+## 1. Run workflow `maven-prepare-release.yml` in actions
+##
 
 on:
   workflow_call:
@@ -106,6 +105,15 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Create Github Release
+        uses: softprops/action-gh-release@v2.3.2
+
+#      - name: Create Github Release
+#        run: |
+#          gh release create v${RELEASE_VERSION} --generate-notes
+#        env:
+#          GITHUB_TOKEN: ${{ inputs.github-token }}
 
       - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main

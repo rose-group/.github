@@ -158,10 +158,9 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
         working-directory: target
-      - name: Deploy gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4.7.3
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          branch: gh-pages
-          folder: target/staging
-          clean: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/staging
 

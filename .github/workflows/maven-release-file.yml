@@ -6,8 +6,9 @@ name: Maven Release By File
 
 ##
 ## Automates the release process
-## 1. Edit `.github/project.yml`
-## 2. Create PR, merge PR
+## 1. Create new branch
+## 2. Edit `.github/project.yml`
+## 3. Create PR, merge PR
 ##
 
 on:

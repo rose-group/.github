@@ -110,14 +110,6 @@ jobs:
           git tag -a "v${RELEASE_VERSION}" -m "Release tag v${RELEASE_VERSION}"
           git push --tags
 
-      - name: Set Next Version
-        run: |
-          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
-          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
-
-          git checkout $GITHUB_REF_NAME
-          git branch -D "release-$RELEASE_VERSION"
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -125,16 +117,18 @@ jobs:
           publish_dir: ./target/staging
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2.3.2
-        with:
-          tag_name: v$RELEASE_VERSION
-          files: |
-            target/*.asc
-            target/*.jar
-            target/*.pom
-            target/*.buildinfoAdd commentMore actions
+        run: |
+          gh release create v${RELEASE_VERSION} --generate-notes target/*.asc target/*.jar target/*.pom target/*.buildinfo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Next Version
+        run: |
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
+
+          git checkout $GITHUB_REF_NAME
+          git branch -D "release-$RELEASE_VERSION"
 
       - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main

@@ -120,24 +120,24 @@
         </executions>
       </plugin>
 
-      <!--      <plugin>-->
-      <!--        <groupId>org.apache.maven.plugins</groupId>-->
-      <!--        <artifactId>maven-artifact-plugin</artifactId>-->
-      <!--        <version>3.5.1</version>-->
-      <!--        <executions>-->
-      <!--          <execution>-->
-      <!--            <goals>-->
-      <!--              <goal>buildinfo</goal>-->
-      <!--            </goals>-->
-      <!--            <phase>verify</phase>-->
-      <!--            <configuration>-->
-      <!--              &lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
-      <!--              <outputTimestamp>${git.commit.time}</outputTimestamp>-->
-      <!--              <reproducible>true</reproducible>-->
-      <!--            </configuration>-->
-      <!--          </execution>-->
-      <!--        </executions>-->
-      <!--      </plugin>-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-artifact-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>buildinfo</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <!--suppress UnresolvedMavenProperty -->
+              <outputTimestamp>${git.commit.time}</outputTimestamp>
+              <reproducible>true</reproducible>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

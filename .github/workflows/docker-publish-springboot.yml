@@ -6,11 +6,13 @@ on:
   workflow_call:
     inputs:
       java:
+        description: Java version to use
         default: '8'
         required: false
         type: string
 
       java-dist:
+        description: Java distribution to use
         default: 'zulu'
         required: false
         type: string

@@ -76,6 +76,7 @@ jobs:
         timeout-minutes: 120
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo $BRANCH
 
           git checkout -b "release-$RELEASE_VERSION"
 

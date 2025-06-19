@@ -75,7 +75,7 @@ jobs:
       - name: Build Release with Maven
         timeout-minutes: 120
         run: |
-          mvn -V -ntp -B clean package source:jar
+          mvn clean package source:jar
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

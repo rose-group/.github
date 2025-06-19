@@ -82,44 +82,50 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@users.noreply.github.com"
 
-      - name: Build Prepare Release with Maven
-        timeout-minutes: 120
+      - name: Set Release version
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
           echo $BRANCH
 
           git checkout -b "release-$RELEASE_VERSION"
 
-          mvn release:prepare -DinteractiveMode=false -DnoBackup=true -DreleaseVersion=$RELEASE_VERSION -Dtag=v$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
+          sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${RELEASE_VERSION}</version>|g" README.md
+          git commit --no-verify -a -m "[CI Skip] Releasing branch ${RELEASE_VERSION}"
 
           git push origin "release-$RELEASE_VERSION"
 
+      - name: Build Release with Maven
+        timeout-minutes: 120
+        run: |
           mvn -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
-
-          git checkout $BRANCH
-
-          git branch -D "release-$RELEASE_VERSION"
-
-          git push --tags
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Create Tag
+        shell: bash
+        run: |
+          git tag -a "v${RELEASE_VERSION}" -m "Release tag v${RELEASE_VERSION}"
+          git push --tags
+
+      - name: Set Next Version
+        run: |
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
+
+          git checkout $GITHUB_REF_NAME
+          git branch -D "release-$RELEASE_VERSION"
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v2.3.2
         with:
           tag_name: v$RELEASE_VERSION
 
-      #      - name: Create Github Release
-#        run: |
-#          gh release create v${RELEASE_VERSION} --generate-notes
-#        env:
-#          GITHUB_TOKEN: ${{ inputs.github-token }}
-
       - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           milestone-title: ${{ env.RELEASE_VERSION }}
-          milestone-next: ${{ env.NEXT_BRANCH }}
+          milestone-next: ${{ env.NEXT_VERSION }}

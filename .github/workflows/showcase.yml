@@ -1,0 +1,77 @@
+name: Showcase
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment_name:
+        description: environment name
+        required: false
+        default: test
+        type: string
+
+jobs:
+  explore_github_actions:
+    runs-on: ubuntu-latest
+    outputs:
+      docker_version: ${{steps.soft_versions.outputs.docker_version}}
+      node_version: ${{steps.soft_versions.outputs.node_version}}
+      java_version: ${{steps.soft_versions.outputs.java_version}}
+    steps:
+      - run: |
+          echo "Username is ${{github.actor}}"
+          echo "Runner os is ${{runner.os}}"
+          echo "Repository is ${{ github.repository }} and branch is ${{ github.ref }}"
+          echo "Event ${{github.event_name}} triggered the workflow"
+          echo "${{github.event.inputs.environment_name}}"
+
+      - name: Display software versions
+        id: soft_versions
+        run: |
+          git -v
+          docker -v
+          node -v
+          echo 1
+          java -version
+          echo 2
+          echo "git_version=$(git -v)" >> $GITHUB_OUTPUT
+          echo "docker_version=$(docker -v)" >> $GITHUB_OUTPUT
+          echo "node_version=$(node -v)" >> $GITHUB_OUTPUT
+
+          JAVA_VERSION=$(java -version 2>&1)
+          SPECIFIC_VERSION=$(echo "$JAVA_VERSION" | awk -F '"' '/version/ {print $2}')
+          echo "java_version=$SPECIFIC_VERSION" >> $GITHUB_OUTPUT
+
+      - name: List files in the repository pre checkout
+        run: ls ${{ github.workspace }}
+
+      - uses: actions/checkout@v4
+
+      - name: List files in the repository after checkout
+        run: ls ${{ github.workspace }}
+
+  display_info:
+    runs-on: ubuntu-latest
+    needs: explore_github_actions
+    steps:
+      - name: output workflow execution summary
+        env:
+          DOCKER_VERSION: ${{needs.explore_github_actions.outputs.docker_version}}
+          NODE_VERSION: ${{needs.explore_github_actions.outputs.node_version}}
+          JAVA_VERSION: ${{needs.explore_github_actions.outputs.java_version}}
+        run: |
+          echo "given docker version is $DOCKER_VERSION"
+          echo "given node version is $NODE_VERSION"
+          echo "given java version is $JAVA_VERSION"
+
+          echo "var | value" >> $GITHUB_STEP_SUMMARY
+          echo "--- | ---" >> $GITHUB_STEP_SUMMARY
+          echo "docker version | $DOCKER_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "node version | $NODE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "java version | $JAVA_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "run id | $GITHUB_RUN_ID" >> $GITHUB_STEP_SUMMARY
+          echo "actor | $GITHUB_ACTOR" >> $GITHUB_STEP_SUMMARY
+          echo "repository|$GITHUB_REPOSITORY" >> $GITHUB_STEP_SUMMARY
+          echo "repository owner|$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)" >> $GITHUB_STEP_SUMMARY
+          echo "ref|$GITHUB_REF" >> $GITHUB_STEP_SUMMARY
+          echo "ref name|$GITHUB_REF_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "os|$RUNNER_OS" >> $GITHUB_STEP_SUMMARY

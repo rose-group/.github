@@ -1,0 +1,91 @@
+# https://github.com/s4u/.github/blob/master/.github/workflows/maven-build.yml
+# https://github.com/jeremylong/DependencyCheck/blob/main/.github/workflows/release.yml
+
+name: Maven Release
+
+##
+## Automates the release process
+## 1. Run `./list-changes.sh` and update the changelog.md.
+## 2. Run `./prepare-release.sh`
+## 3. Create PR, merge PR
+## 4. Run `git push origin --tags`
+##
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_call:
+
+env:
+  MAVEN_ARGS: -ntp -U -B
+
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+          cache: 'maven'
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Get Version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build, Test, and Generate Site
+        run: |
+          mvn -V -ntp -B -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Generate Changelog
+        id: changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          onlyLastTag: true
+          stripHeaders: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ steps.get_version.outputs.VERSION }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          files: |
+            target/*.jar
+            target/*.pom
+            target/*.asc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      #      - name: Create GitHub Release
+      #        run: |
+      #          gh release create v${RELEASE_VERSION} --generate-notes *.asc *.jar *.pom
+      #        env:
+      #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/staging
+

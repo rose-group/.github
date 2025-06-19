@@ -1,0 +1,32 @@
+name: Maven Release By Manual
+
+##
+## Automates the release process
+## 1. Run this workflow, input Release version and Next version.
+##
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: "Release version"
+        required: true
+        default: "0.0.1"
+      next-version:
+        description: "Next version"
+        required: true
+        default: "0.0.2-SNAPSHOT"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rosestack/maven-release-by-manual-action@main
+        with:
+          release-version: ${{github.event.inputs.release-version}}
+          next-version: ${{github.event.inputs.next-version}}
+          gpg-secret-key: ${{secrets.GPG_PRIVATE_KEY}}
+          gpg-passphrase: ${{secrets.GPG_PASSPHRASE}}
+          ossrh-username: ${{secrets.MAVEN_USERNAME}}
+          ossrh-password: ${{secrets.MAVEN_PASSWORD}}
+          github-token: ${{secrets.GITHUB_TOKEN}}

@@ -1,0 +1,156 @@
+name: Maven Prepare Release
+
+##
+## Automates the release process
+## 1. Run workflow `maven-prepare-release.yml` in actions
+##
+
+on:
+  workflow_call:
+      java:
+        description: Java version to use
+        default: '8'
+        required: false
+        type: string
+      java-dist:
+        description: Java distribution to use
+        default: 'zulu'
+        required: false
+        type: string
+      inputs:
+        release-version:
+          description: "Release version"
+          required: true
+          type: string
+          default: "0.0.1"
+        next-version:
+          description: "Next version"
+          required: true
+          type: string
+          default: "0.0.2-SNAPSHOT"
+
+  workflow_dispatch:
+    inputs:
+      java:
+        description: Java version to use
+        default: '8'
+        required: false
+        type: string
+      java-dist:
+        description: Java distribution to use
+        default: 'zulu'
+        required: false
+        type: string
+      inputs:
+        release-version:
+          description: "Release version"
+          required: true
+          type: string
+          default: "0.0.1"
+        next-version:
+          description: "Next version"
+          required: true
+          type: string
+          default: "0.0.2-SNAPSHOT"
+
+env:
+  MAVEN_ARGS: -ntp -U -B
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "RELEASE_VERSION=${DISPATCH_RELEASE_VERSION}" >> $GITHUB_ENV
+          echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION}" >> $GITHUB_ENV
+        env:
+          DISPATCH_RELEASE_VERSION: ${{ inputs.release-version }}
+          DISPATCH_NEXT_VERSION: ${{ inputs.next-version }}
+
+      - name: Validate version
+        if: contains(env.RELEASE_VERSION, 'SNAPSHOT')
+        run: |
+          echo '::error::Cannot release a SNAPSHOT version.'
+          exit 1
+
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ inputs.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java }}
+          distribution: ${{ inputs.java-dist }}
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # macOS: gpg --armor --export-secret-key
+
+      - name: Get version
+        run: |
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "VERSION=$VERSION"
+          if [[ $VERSION != *-SNAPSHOT ]]; then
+            echo "::error::You don't have a SNAPSHOT project in the projects list."
+            exit 1
+          fi
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+
+      - name: Set Release version
+        run: |
+          git checkout -b "release-$RELEASE_VERSION"
+
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
+          sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${RELEASE_VERSION}</version>|g" README.md
+          git commit --no-verify -a -m "[CI Skip] Releasing branch ${RELEASE_VERSION}"
+
+          git push origin "release-$RELEASE_VERSION"
+
+      - name: Build Release with Maven
+        timeout-minutes: 120
+        run: |
+          mvn -Prelease clean package source:jar javadoc:jar gpg:sign deploy site site:stage
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Create Tag
+        shell: bash
+        run: |
+          git tag -a "v${RELEASE_VERSION}" -m "Release tag v${RELEASE_VERSION}"
+          git push --tags
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/staging
+
+      - name: Create GitHub Release
+        run: |
+          gh release create v${RELEASE_VERSION} --generate-notes target/*.asc target/*.jar target/*.pom
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Next Version
+        run: |
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
+          git commit --no-verify -a -m "[CI Skip] Next version ${NEXT_VERSION}"
+
+          git checkout $GITHUB_REF_NAME
+          git branch -D "release-$RELEASE_VERSION"
+
+      - name: Creates a Release with a changelog from a Milestone
+        uses: rosestack/milestone-release-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          milestone-title: ${{ env.RELEASE_VERSION }}
+          milestone-next: ${{ env.NEXT_VERSION }}

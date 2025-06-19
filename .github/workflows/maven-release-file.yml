@@ -1,0 +1,30 @@
+# https://github.com/smallrye/smallrye-config/blob/main/.github/workflows/prepare-release.yml
+
+name: Maven Release By File
+
+# This action is only intended to run with Pull Request events for now.
+
+##
+## Automates the release process
+## 1. Create new branch
+## 2. Edit `.github/project.yml`
+## 3. Create PR, merge PR
+##
+
+on:
+  pull_request:
+    types: [ closed ]
+    paths:
+      - '.github/project.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rosestack/maven-release-by-file-action@main
+        with:
+          gpg-secret-key: ${{secrets.GPG_PRIVATE_KEY}}
+          gpg-passphrase: ${{secrets.GPG_PASSPHRASE}}
+          ossrh-username: ${{secrets.MAVEN_USERNAME}}
+          ossrh-password: ${{secrets.MAVEN_PASSWORD}}
+          github-token: ${{secrets.GITHUB_TOKEN}}

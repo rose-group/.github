@@ -7,30 +7,51 @@ name: Maven Prepare Release
 
 on:
   workflow_call:
-    inputs:
-      release-version:
-        description: "Release version"
-        required: true
+      java:
+        description: Java version to use
+        default: '8'
+        required: false
         type: string
-        default: "0.0.1"
-      next-version:
-        description: "Next version"
-        required: true
+      java-dist:
+        description: Java distribution to use
+        default: 'zulu'
+        required: false
         type: string
-        default: "0.0.2-SNAPSHOT"
+      inputs:
+        release-version:
+          description: "Release version"
+          required: true
+          type: string
+          default: "0.0.1"
+        next-version:
+          description: "Next version"
+          required: true
+          type: string
+          default: "0.0.2-SNAPSHOT"
 
   workflow_dispatch:
     inputs:
-      release-version:
-        description: "Release version"
-        required: true
+      java:
+        description: Java version to use
+        default: '8'
+        required: false
         type: string
-        default: "0.0.1"
-      next-version:
-        description: "Next version"
-        required: true
+      java-dist:
+        description: Java distribution to use
+        default: 'zulu'
+        required: false
         type: string
-        default: "0.0.2-SNAPSHOT"
+      inputs:
+        release-version:
+          description: "Release version"
+          required: true
+          type: string
+          default: "0.0.1"
+        next-version:
+          description: "Next version"
+          required: true
+          type: string
+          default: "0.0.2-SNAPSHOT"
 
 env:
   MAVEN_ARGS: -V -ntp -U -B
@@ -56,11 +77,11 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Set up Java 8
+      - name: Set up Java ${{ inputs.java }}
         uses: actions/setup-java@v4
         with:
-          java-version: 8
-          distribution: 'zulu'
+          java-version: ${{ inputs.java }}
+          distribution: ${{ inputs.java-dist }}
           cache: maven
           server-id: central
           server-username: MAVEN_USERNAME
@@ -115,7 +136,7 @@ jobs:
 
       - name: Create GitHub Release
         run: |
-          gh release create v${RELEASE_VERSION} --generate-notes target/*.asc target/*.jar target/*.pom target/*.buildinfo
+          gh release create v${RELEASE_VERSION} --generate-notes target/*.asc target/*.jar target/*.pom
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

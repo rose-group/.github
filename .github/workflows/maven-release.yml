@@ -18,13 +18,12 @@ on:
   workflow_call:
     inputs:
       java:
-        description: Java version to use
+        description: Java version
         default: '8'
         required: false
         type: string
-
       java-dist:
-        description: Java distribution to use
+        description: Java distribution
         default: 'zulu'
         required: false
         type: string
@@ -32,13 +31,12 @@ on:
   workflow_dispatch:
     inputs:
       java:
-        description: Java version to use
+        description: Java version
         default: '8'
         required: false
         type: string
-
       java-dist:
-        description: Java distribution to use
+        description: Java distribution
         default: 'zulu'
         required: false
         type: string
@@ -140,13 +138,8 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            *.asc
-            *.jar
-            *.pom
-            *.buildinfo
+        run: |
+          gh release create v${RELEASE_VERSION} --generate-notes *.asc *.jar *.pom
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

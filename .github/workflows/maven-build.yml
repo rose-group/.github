@@ -6,16 +6,17 @@ on:
   workflow_call:
     inputs:
       os:
+        description: OS
         default: '["windows-latest", "ubuntu-latest", "macOs-latest"]'
         required: false
         type: string
-
       java-matrix:
+        description: Java Version
         default: '["8", "11", "17", "21", "24"]'
         required: false
         type: string
-
       java-dist-matrix:
+        description: Java Distribution
         default: '["zulu"]'
         required: false
         type: string
@@ -27,13 +28,11 @@ on:
         default: '["windows-latest", "ubuntu-latest", "macOs-latest"]'
         required: false
         type: string
-
       java-matrix:
         description: Java Version
         default: '["8", "11", "17", "21", "24"]'
         required: false
         type: string
-
       java-dist-matrix:
         description: Java Distribution
         default: '["zulu"]'
@@ -75,13 +74,4 @@ jobs:
       - name: Build Release with Maven
         timeout-minutes: 120
         run: |
-          mvn clean package source:jar
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        if: >
-          matrix.os == 'ubuntu-latest'
-          && matrix.java == '17'
-          && startsWith( github.ref, 'refs/heads/')
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          mvn clean package

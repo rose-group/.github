@@ -3,14 +3,18 @@
 name: Docker Publish by SpringBoot
 
 on:
+  push:
+    tags:
+      - "v*"
   workflow_call:
     inputs:
       java:
+        description: Java version to use
         default: '8'
         required: false
         type: string
-
       java-dist:
+        description: Java distribution to use
         default: 'zulu'
         required: false
         type: string
@@ -22,7 +26,6 @@ on:
         default: '8'
         required: false
         type: string
-
       java-dist:
         description: Java distribution to use
         default: 'zulu'

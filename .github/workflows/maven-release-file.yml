@@ -2,11 +2,12 @@
 
 name: Maven Release By File
 
+# This action is only intended to run with Pull Request events for now.
+
 ##
 ## Automates the release process
-## 1. Edit the file .github/project.yml, update version.
-## 2. Commit
-## 3. Create PR, merge PR
+## 1. Edit `.github/project.yml`
+## 2. Create PR, merge PR
 ##
 
 on:

@@ -121,7 +121,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ inputs.github-token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/staging
 
       - name: Create GitHub Release
@@ -134,7 +134,7 @@ jobs:
             target/*.pom
             target/*.buildinfoAdd commentMore actions
         env:
-          GITHUB_TOKEN: ${{ inputs.github-token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main

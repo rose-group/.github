@@ -140,13 +140,8 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            *.asc
-            *.jar
-            *.pom
-            *.buildinfo
+        run: |
+          gh release create v${RELEASE_VERSION} --generate-notes *.asc *.jar *.pom
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

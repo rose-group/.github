@@ -67,6 +67,10 @@ jobs:
         run: |
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
           echo "VERSION=$VERSION"
+          if [[ $VERSION != *-SNAPSHOT ]]; then
+            echo '::error::You don't have a SNAPSHOT project in the reactor projects list.'
+            exit 1
+          fi
 
       - name: Build Prepare Release with Maven
         timeout-minutes: 120

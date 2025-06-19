@@ -90,6 +90,8 @@ jobs:
           git branch -D "release-$RELEASE_VERSION"
 
           git push --tags
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main

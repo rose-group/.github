@@ -9,7 +9,7 @@
   </parent>
   <groupId>io.github.rosestack</groupId>
   <artifactId>test</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.5-SNAPSHOT</version>
 
   <description>Github Action Templates</description>
   <url>https://rosestack.github.io/.github</url>
@@ -131,26 +131,6 @@
               <!--suppress UnresolvedMavenProperty -->
               <outputTimestamp>${git.commit.time}</outputTimestamp>
               <reproducible>true</reproducible>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-            <phase>verify</phase>
-            <configuration>
-              <gpgArguments>
-                <arg>--pinentry-mode</arg>
-                <arg>loopback</arg>
-              </gpgArguments>
             </configuration>
           </execution>
         </executions>

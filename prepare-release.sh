@@ -8,6 +8,7 @@ RELEASE=${SNAPSHOT/-SNAPSHOT/}
 
 git checkout -b "release-$RELEASE"
 
+#  mvn release:prepare -DreleaseVersion=$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
 mvn -ntp -B release:prepare
 mvn -ntp -B release:clean
 

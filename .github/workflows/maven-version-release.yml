@@ -12,7 +12,7 @@ name: Maven Version Release
 on:
   workflow_call:
     inputs:
-      current-version:
+      release-version:
         description: "Release version"
         required: true
         type: string
@@ -25,7 +25,7 @@ on:
 
   workflow_dispatch:
     inputs:
-      current-version:
+      release-version:
         description: "Release version"
         required: true
         type: string
@@ -49,17 +49,17 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "CURRENT_VERSION=${DISPATCH_CURRENT_VERSION}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=${DISPATCH_RELEASE_VERSION}" >> $GITHUB_ENV
           echo "NEXT_VERSION=${DISPATCH_NEXT_VERSION}" >> $GITHUB_ENV
           echo "NEXT_BRANCH=$(echo ${DISPATCH_NEXT_VERSION} | sed 's/-SNAPSHOT//')" >> $GITHUB_ENV
         env:
-          DISPATCH_CURRENT_VERSION: ${{ inputs.current-version }}
+          DISPATCH_RELEASE_VERSION: ${{ inputs.release-version }}
           DISPATCH_NEXT_VERSION: ${{ inputs.next-version }}
 
       - name: Validate version
-        if: contains(env.CURRENT_VERSION, 'SNAPSHOT')
+        if: contains(env.RELEASE_VERSION, 'SNAPSHOT')
         run: |
-          echo '::error::CURRENT_VERSION cannot be a SNAPSHOT version.'
+          echo '::error::RELEASE_VERSION cannot be a SNAPSHOT version.'
           exit 1
 
       - name: Checkout Source
@@ -76,23 +76,23 @@ jobs:
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-          git checkout -b "release-$CURRENT_VERSION"
+          git checkout -b "release-$RELEASE_VERSION"
 
           # create new tag for release
-          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${CURRENT_VERSION}
-          sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${CURRENT_VERSION}</version>|g" README.md
+          mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
+          sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${RELEASE_VERSION}</version>|g" README.md
 
-          git tag -a "v${CURRENT_VERSION}" -m "[CI Skip] Release v${CURRENT_VERSION}"
+          git tag -a "v${RELEASE_VERSION}" -m "[CI Skip] Release v${RELEASE_VERSION}"
 
           # update version to snapshot
           mvn versions:set -DprocessAllModules=true -DgenerateBackupPoms=false -DnewVersion=${NEXT_VERSION}
           sed -i "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>${NEXT_VERSION}</version>|g" README.md
           git diff --exit-code || git commit -am "[CI Skip] prepare for next development iteration"
-          git push origin "release-$CURRENT_VERSION"
+          git push origin "release-$RELEASE_VERSION"
 
           git checkout $BRANCH
 
-          git branch -D "release-$CURRENT_VERSION"
+          git branch -D "release-$RELEASE_VERSION"
 
           git push --tags
 
@@ -100,5 +100,5 @@ jobs:
         uses: rosestack/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          milestone-title: ${{ env.CURRENT_VERSION }}
+          milestone-title: ${{ env.RELEASE_VERSION }}
           milestone-next: ${{ env.NEXT_BRANCH }}

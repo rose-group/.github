@@ -1,4 +1,4 @@
-name: Maven Version Release
+name: Maven Prepare Release with Version
 
 ## Step:
 ## 1. Create release branch in local
@@ -96,7 +96,7 @@ jobs:
 
           git push --tags
 
-      - name: Release Milestone
+      - name: Creates a Release with a changelog from a Milestone
         uses: rosestack/milestone-release-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

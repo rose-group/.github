@@ -80,7 +80,7 @@ jobs:
 
           git checkout -b "release-$RELEASE_VERSION"
 
-          mvn release:prepare -DreleaseVersion=$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
+          mvn release:prepare -DinteractiveMode=false -DreleaseVersion=$RELEASE_VERSION -DdevelopmentVersion=$NEXT_VERSION
           mvn release:clean
 
           git push origin "release-$RELEASE_VERSION"
@@ -90,3 +90,10 @@ jobs:
           git branch -D "release-$RELEASE_VERSION"
 
           git push --tags
+
+      - name: Creates a Release with a changelog from a Milestone
+        uses: rosestack/milestone-release-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          milestone-title: ${{ env.RELEASE_VERSION }}
+          milestone-next: ${{ env.NEXT_BRANCH }}

@@ -110,12 +110,6 @@ generate_changelog_content() {
     local latest_tag=""
     [[ "$CHANGELOG_MODE" = "latest" ]] && latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
-    if [[ -n "$latest_tag" ]]; then
-        log info "Generating changelog from commits since tag ${YELLOW}$latest_tag${RESET}"
-    else
-        log info "Generating changelog from all commits"
-    fi
-
     local changelog_content=""
     for i in "${!COMMIT_TYPES[@]}"; do
         local type_key="${COMMIT_TYPES[$i]}"

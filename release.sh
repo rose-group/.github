@@ -31,6 +31,7 @@ declare NEW_VERSION=""
 declare PERFORM_CHANGELOG=false
 declare DRY_RUN=false
 declare ALLOW_DIRTY=false
+declare AUTO_CONFIRM=false
 declare CHANGELOG_MODE="latest"
 declare CURRENT_BRANCH=""
 declare CURRENT_VERSION=""
@@ -109,12 +110,6 @@ calculate_version() {
 generate_changelog_content() {
     local latest_tag=""
     [[ "$CHANGELOG_MODE" = "latest" ]] && latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-
-    if [[ -n "$latest_tag" ]]; then
-        log info "Generating changelog from commits since tag ${YELLOW}$latest_tag${RESET}"
-    else
-        log info "Generating changelog from all commits"
-    fi
 
     local changelog_content=""
     for i in "${!COMMIT_TYPES[@]}"; do
@@ -399,7 +394,8 @@ pre_flight_checks() {
 }
 
 confirm_plan() {
-    echo -e "\n${BOLD}${BLUE}${ICON_ROCKET} RELEASE PLAN${RESET}"
+    echo
+    echo -e "${BOLD}${BLUE}${ICON_ROCKET} RELEASE PLAN${RESET}"
     separator
 
     local changelog_status="No"
@@ -423,13 +419,29 @@ confirm_plan() {
         return
     }
 
-    read -p "$(echo -e "Do you want to proceed with this plan? [${GREEN}Y${RESET}/n]: ")" -r choice
+    if [[ "$AUTO_CONFIRM" = true ]]; then
+        echo "Auto-confirming release plan..."
+        return
+    fi
+
+    echo -n "Do you want to proceed with this plan? [Y/n]: "
+    
+    # Try to read input with a timeout
+    if read -r -t 10 choice 2>/dev/null; then
+        echo "$choice"
+    else
+        echo "Y (auto-selected due to timeout)"
+        choice="Y"
+    fi
+    
     choice=${choice:-Y}
-    [[ ! "$choice" =~ ^[Yy]$ ]] && { log error "Aborted by user"; exit 1; }
+    if [[ ! "$choice" =~ ^[Yy]$ ]]; then
+        log error "Aborted by user"
+        exit 1
+    fi
 }
 
 parse_args() {
-    echo
     CURRENT_VERSION=$(get_current_version)
     [[ -z "$CURRENT_VERSION" ]] && { log error "Could not determine current project version from pom.xml"; exit 1; }
 
@@ -455,6 +467,10 @@ parse_args() {
                 ;;
             -a|--allow-dirty)
                 ALLOW_DIRTY=true
+                shift
+                ;;
+            -y|--yes)
+                AUTO_CONFIRM=true
                 shift
                 ;;
             -h|--help)
@@ -494,6 +510,7 @@ OPTIONS:
     -c, --changelog [mode]    Generate a changelog. Mode: 'latest' (default) or 'all'
     -n, --dry-run             Simulate the process without making actual changes
     -a, --allow-dirty         Allow running with uncommitted changes
+    -y, --yes                 Auto-confirm release plan without prompting
     -h, --help                Show this help message
 
 GITLAB INTEGRATION:

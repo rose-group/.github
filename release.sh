@@ -31,6 +31,7 @@ declare NEW_VERSION=""
 declare PERFORM_CHANGELOG=false
 declare DRY_RUN=false
 declare ALLOW_DIRTY=false
+declare AUTO_CONFIRM=false
 declare CHANGELOG_MODE="latest"
 declare CURRENT_BRANCH=""
 declare CURRENT_VERSION=""
@@ -417,13 +418,12 @@ confirm_plan() {
         return
     }
 
-    read -p "$(echo -e "Do you want to proceed with this plan? [${GREEN}Y${RESET}/n]: ")" -r choice
+    read -p "Do you want to proceed with this plan? [Y/n]: " -r choice
     choice=${choice:-Y}
     [[ ! "$choice" =~ ^[Yy]$ ]] && { log error "Aborted by user"; exit 1; }
 }
 
 parse_args() {
-    echo
     CURRENT_VERSION=$(get_current_version)
     [[ -z "$CURRENT_VERSION" ]] && { log error "Could not determine current project version from pom.xml"; exit 1; }
 

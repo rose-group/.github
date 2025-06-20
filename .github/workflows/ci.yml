@@ -21,6 +21,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
+
+env:
+  MAVEN_ARGS: -ntp -U -B
+
 jobs:
   # 快速检查 - 仅在最新环境运行基本测试
   quick-check:

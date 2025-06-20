@@ -1,0 +1,147 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.gitignore'
+      - '.editorconfig'
+  pull_request:
+    branches: [ main, master ]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.gitignore'
+      - '.editorconfig'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+jobs:
+  # 快速检查 - 仅在最新环境运行基本测试
+  quick-check:
+    name: Quick Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: maven
+
+      - name: Run Quick Tests
+        run: |
+          mvn clean compile test-compile
+          mvn test -Dtest=*Test
+        timeout-minutes: 30
+
+      - name: Quick Quality Check
+        run: |
+          mvn checkstyle:check
+          mvn spotbugs:check
+        timeout-minutes: 15
+
+  # 完整构建测试 - 调用可重用的 maven-build.yml
+  full-build:
+    name: Full Build & Test
+    needs: quick-check
+    if: always() && (needs.quick-check.result == 'success' || github.event_name == 'push')
+    uses: ./.github/workflows/maven-build.yml
+    with:
+      # 对于 PR，只在 Ubuntu 上测试主要 Java 版本
+      os: ${{ github.event_name == 'pull_request' && '["ubuntu-latest"]' || '["ubuntu-latest", "windows-latest", "macOs-latest"]' }}
+      java-matrix: ${{ github.event_name == 'pull_request' && '["17"]' || '["8", "17", "21"]' }}
+      java-dist-matrix: '["zulu"]'
+
+  # 安全检查
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: OWASP Dependency Check
+        run: mvn org.owasp:dependency-check-maven:check
+        continue-on-error: true
+
+      - name: Upload Security Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan-results
+          path: target/dependency-check-report.html
+          retention-days: 30
+
+  # 部署到快照仓库 (仅主分支)
+  deploy-snapshot:
+    name: Deploy Snapshot
+    runs-on: ubuntu-latest
+    needs: full-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'SNAPSHOT')
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Deploy to Snapshot Repository
+        run: mvn deploy -DskipTests
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+  # 通知状态
+  notify:
+    name: Notify Status
+    runs-on: ubuntu-latest
+    needs: [quick-check, full-build, security-scan, deploy-snapshot]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Build Status Summary
+        run: |
+          echo "## 🚀 Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Quick Check | ${{ needs.quick-check.result == 'success' && '✅ Passed' || needs.quick-check.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Full Build | ${{ needs.full-build.result == 'success' && '✅ Passed' || needs.full-build.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result == 'success' && '✅ Passed' || needs.security-scan.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy Snapshot | ${{ needs.deploy-snapshot.result == 'success' && '✅ Deployed' || needs.deploy-snapshot.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY

@@ -78,28 +78,27 @@ jobs:
     continue-on-error: false
     needs: quick-check
     if: |
-      always() && 
-      !contains(github.event.head_commit.message, '[CI Skip]') && 
+      always() &&
+      !contains(github.event.head_commit.message, '[CI Skip]') &&
       !contains(github.event.pull_request.title, '[CI Skip]') &&
       (needs.quick-check.result == 'success' || needs.quick-check.result == 'skipped' || github.event_name == 'push' || github.event_name == 'workflow_dispatch')
 
     strategy:
       fail-fast: false
       matrix:
-        # 根据触发方式动态调整测试矩阵
-        os: ${{ 
+        os: ${{
           github.event_name == 'workflow_dispatch' && fromJSON(inputs.os) ||
-          github.event_name == 'pull_request' && fromJSON('["ubuntu-latest"]') || 
-          fromJSON('["ubuntu-latest", "windows-latest", "macOs-latest"]') 
+          github.event_name == 'pull_request' && fromJSON('["ubuntu-latest"]') ||
+          fromJSON('["ubuntu-latest", "windows-latest", "macOs-latest"]')
         }}
-        java: ${{ 
+        java: ${{
           github.event_name == 'workflow_dispatch' && fromJSON(inputs.java-matrix) ||
-          github.event_name == 'pull_request' && fromJSON('["17"]') || 
-          fromJSON('["8", "17", "21", "24"]') 
+          github.event_name == 'pull_request' && fromJSON('["17"]') ||
+          fromJSON('["8", "17", "21", "24"]')
         }}
-        java-dist: ${{ 
+        java-dist: ${{
           github.event_name == 'workflow_dispatch' && fromJSON(inputs.java-dist-matrix) ||
-          fromJSON('["zulu"]') 
+          fromJSON('["zulu"]')
         }}
 
     steps:
@@ -239,8 +238,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-matrix, quality-analysis]
     if: |
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
       contains(github.event.head_commit.message, 'SNAPSHOT') &&
       needs.build-matrix.result == 'success'
     steps:
@@ -290,7 +289,7 @@ jobs:
           echo "- **Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Trigger:** \`${{ github.event_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Actor:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          
+
           # 如果有失败的job，添加故障排除信息
           if [[ "${{ needs.build-matrix.result }}" == "failure" || "${{ needs.quality-analysis.result }}" == "failure" || "${{ needs.security-scan.result }}" == "failure" ]]; then
             echo "" >> $GITHUB_STEP_SUMMARY

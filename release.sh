@@ -428,7 +428,6 @@ confirm_plan() {
     [[ ! "$choice" =~ ^[Yy]$ ]] && { log error "Aborted by user"; exit 1; }
 }
 
-# === ARGUMENT PARSING ===
 parse_args() {
     echo
     CURRENT_VERSION=$(get_current_version)

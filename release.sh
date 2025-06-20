@@ -394,7 +394,8 @@ pre_flight_checks() {
 }
 
 confirm_plan() {
-    echo -e "\n${BOLD}${BLUE}${ICON_ROCKET} RELEASE PLAN${RESET}"
+    echo
+    echo -e "${BOLD}${BLUE}${ICON_ROCKET} RELEASE PLAN${RESET}"
     separator
 
     local changelog_status="No"
@@ -418,9 +419,26 @@ confirm_plan() {
         return
     }
 
-    read -p "Do you want to proceed with this plan? [Y/n]: " -r choice
+    if [[ "$AUTO_CONFIRM" = true ]]; then
+        echo "Auto-confirming release plan..."
+        return
+    fi
+
+    echo -n "Do you want to proceed with this plan? [Y/n]: "
+    
+    # Try to read input with a timeout
+    if read -r -t 10 choice 2>/dev/null; then
+        echo "$choice"
+    else
+        echo "Y (auto-selected due to timeout)"
+        choice="Y"
+    fi
+    
     choice=${choice:-Y}
-    [[ ! "$choice" =~ ^[Yy]$ ]] && { log error "Aborted by user"; exit 1; }
+    if [[ ! "$choice" =~ ^[Yy]$ ]]; then
+        log error "Aborted by user"
+        exit 1
+    fi
 }
 
 parse_args() {
@@ -449,6 +467,10 @@ parse_args() {
                 ;;
             -a|--allow-dirty)
                 ALLOW_DIRTY=true
+                shift
+                ;;
+            -y|--yes)
+                AUTO_CONFIRM=true
                 shift
                 ;;
             -h|--help)
@@ -488,6 +510,7 @@ OPTIONS:
     -c, --changelog [mode]    Generate a changelog. Mode: 'latest' (default) or 'all'
     -n, --dry-run             Simulate the process without making actual changes
     -a, --allow-dirty         Allow running with uncommitted changes
+    -y, --yes                 Auto-confirm release plan without prompting
     -h, --help                Show this help message
 
 GITLAB INTEGRATION:

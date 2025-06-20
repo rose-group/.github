@@ -38,7 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * refactor: 优化脚本以生成更详细的变更日志 (15842d6)
 
 ## [0.0.15] - 2025-06-20
-Generating changelog from all commits
 
 ### 🔨 Code Refactoring
 

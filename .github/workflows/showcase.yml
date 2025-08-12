@@ -44,7 +44,7 @@ jobs:
       - name: List files in the repository pre checkout
         run: ls ${{ github.workspace }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: List files in the repository after checkout
         run: ls ${{ github.workspace }}
